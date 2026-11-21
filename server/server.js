@@ -17,6 +17,9 @@ app.use(express.json());
 const publicDirectoryPath = path.join(__dirname, '../public');
 app.use(express.static(publicDirectoryPath));
 
+// Added to serve .well-known files (like assetlinks.json)
+app.use('/.well-known', express.static(path.join(__dirname, '../public/.well-known')));
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] }
