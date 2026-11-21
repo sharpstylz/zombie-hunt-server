@@ -1,0 +1,32 @@
+{
+  "background_color": "#141c18",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "ZOMBIE HUNT",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "ZOMBIE HUNT",
+  "start_url": "/",
+  "theme_color": "#2e7d5b",
+  "id": "zombie-hunt",
+  "description": "4 squads enter, 1 squad survives. Tactical zombie card duel and bluff arena.",
+  "lang": "en",
+  "categories": [
+    "entertainment",
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "appstore-images/android/android-launchericon-192-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "appstore-images/android/android-launchericon-512-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
