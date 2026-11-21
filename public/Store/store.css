@@ -1,0 +1,962 @@
+/* =========================================================
+   ZOMBIE HUNT — DEDICATED FULL-PAGE STORE WORLD CSS v5.0
+   Location: public/store/store.css
+========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100vh;
+  font-family: "DM Sans", sans-serif;
+  color: #18221d;
+  background: #efe5ce;
+  overflow-x: hidden;
+}
+
+/* TOP BAR */
+.topbar {
+  height: 80px;
+  padding: 0 4.5vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(246, 238, 218, 0.82);
+  backdrop-filter: blur(20px);
+  border-bottom: 1.5px solid rgba(24, 34, 29, 0.14);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.nav-pill-btn {
+  border: 1.5px solid rgba(24, 34, 29, 0.2);
+  background: rgba(255, 250, 238, 0.92);
+  color: #18221d;
+  padding: 9px 16px;
+  border-radius: 22px;
+  font-family: "Oswald", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-pill-btn:hover {
+  transform: translateY(-2px);
+  background: #18221d;
+  color: #f5c85b;
+}
+
+.store-brand-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-store-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.store-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 30px;
+  letter-spacing: 1.8px;
+  line-height: 1;
+}
+
+.store-title i {
+  color: #d63d2a;
+  font-style: normal;
+}
+
+.store-sub {
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 2.2px;
+  color: #545e57;
+  margin-top: 2px;
+}
+
+.top-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wallet-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #18221d;
+  color: #fff3cd;
+  padding: 5px 7px 5px 12px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(245, 200, 91, 0.35);
+  font-family: "Oswald", sans-serif;
+  font-size: 14px;
+}
+
+.coin-icon {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+}
+
+.wallet-plus-btn {
+  border: 0;
+  background: linear-gradient(135deg, #f5c85b, #d49a1a);
+  color: #141c18;
+  font-family: "Oswald", sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   STORE SHELL & HERO (DUAL VIP PLANS + LIVE TRY-ON STAGE)
+========================================================= */
+.store-page-shell {
+  width: min(1260px, 94vw);
+  margin: 0 auto;
+  padding: 28px 0 80px;
+}
+
+.store-hero-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 24px;
+}
+
+.vip-showcase-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(140deg, #17221d 0%, #241d14 60%, #141c18 100%);
+  color: #faf3df;
+  border: 2.5px solid #d4aa36;
+  border-radius: 28px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 28px 65px rgba(20, 28, 24, 0.28);
+}
+
+.vip-glow-orb {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 200, 91, 0.25) 0%, transparent 70%);
+  top: -80px;
+  right: -60px;
+  pointer-events: none;
+}
+
+.vip-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.vip-eyebrow {
+  display: inline-block;
+  font-family: "Oswald", sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #f5c85b;
+  background: rgba(245, 200, 91, 0.14);
+  border: 1px solid rgba(245, 200, 91, 0.35);
+  padding: 4px 11px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.vip-showcase-card h1 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 42px;
+  letter-spacing: 1.5px;
+  line-height: 0.95;
+}
+
+.vip-showcase-card h1 i {
+  color: #f5c85b;
+  font-style: normal;
+}
+
+.vip-lead {
+  font-size: 13px;
+  color: #d7d0c0;
+  line-height: 1.45;
+  margin: 10px 0 14px;
+}
+
+.vip-perks-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.vip-perks-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 9px 11px;
+  border-radius: 14px;
+}
+
+.perk-bullet {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #2e7d5b;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vip-perks-list strong {
+  display: block;
+  font-family: "Oswald", sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.5px;
+  color: #fff3cd;
+}
+
+.vip-perks-list small {
+  display: block;
+  font-size: 10.5px;
+  color: #b8b2a4;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* DUAL VIP PLANS GRID */
+.vip-plans-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 12px;
+}
+
+.vip-plan-box {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(245, 200, 91, 0.35);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.vip-plan-box.featured-six-month {
+  background: linear-gradient(135deg, rgba(212, 154, 26, 0.18), rgba(214, 61, 42, 0.15));
+  border: 2px solid #f5c85b;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.plan-save-ribbon {
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  background: #d63d2a;
+  color: #ffffff;
+  font-family: "Oswald", sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 2px 9px;
+  border-radius: 10px;
+}
+
+.plan-duration {
+  font-family: "Oswald", sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #f5c85b;
+}
+
+.plan-price {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 36px;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.vip-plan-box small {
+  font-size: 10.5px;
+  color: #d1cbc0;
+  margin-bottom: 4px;
+}
+
+.vip-preview-btn {
+  border: 1.5px solid rgba(245, 200, 91, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f5c85b;
+  padding: 9px 15px;
+  border-radius: 12px;
+  font-family: "Oswald", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.vip-buy-btn {
+  width: 100%;
+  border: 0;
+  background: #2e7d5b;
+  color: #ffffff;
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-family: "Oswald", sans-serif;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.vip-buy-btn.gold-six-btn {
+  background: linear-gradient(135deg, #f5c85b, #d49a1a);
+  color: #141c18;
+  font-weight: 900;
+}
+
+.vip-buy-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* RIGHT: LIVE INTERACTIVE TRY-ON STAGE */
+.live-preview-stage {
+  background: rgba(252, 246, 230, 0.88);
+  backdrop-filter: blur(18px);
+  border: 2px solid rgba(24, 34, 29, 0.16);
+  border-radius: 28px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 24px 60px rgba(24, 34, 29, 0.14);
+}
+
+.stage-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.stage-head small {
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 1.6px;
+  color: #5c665f;
+}
+
+.stage-head h2 {
+  font-family: "Oswald", sans-serif;
+  font-size: 20px;
+}
+
+.stage-item-label {
+  font-family: "Oswald", sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: #18221d;
+  color: #f5c85b;
+  padding: 4px 11px;
+  border-radius: 20px;
+}
+
+.stage-table-felt {
+  flex: 1;
+  min-height: 230px;
+  border-radius: 20px;
+  background: radial-gradient(ellipse at center, #4c8c6e 0%, #2b6149 60%, #193f2e 100%);
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 16px;
+  flex-wrap: wrap;
+  transition: background 0.35s ease;
+}
+
+.stage-table-felt.table-crimson-velvet {
+  background: radial-gradient(ellipse at center, #8c2626 0%, #521212 62%, #2b0707 100%) !important;
+}
+
+.stage-table-felt.table-obsidian-war {
+  background: radial-gradient(ellipse at center, #2c353d 0%, #161b20 62%, #0a0d10 100%) !important;
+}
+
+.stage-identity-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.stage-avatar-ring {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid #faf3df;
+  background: #18221d;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  transition: all 0.25s ease;
+}
+
+.stage-avatar-ring > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.stage-name-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #ffffff;
+  font-family: "Oswald", sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.8px;
+}
+
+.stage-callsign-badge {
+  display: inline-block;
+  font-family: "Oswald", sans-serif;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #f5c85b;
+  border: 1px solid rgba(245, 200, 91, 0.4);
+  padding: 3px 10px;
+  border-radius: 14px;
+  margin-top: 3px;
+}
+
+.stage-cards-fan {
+  display: flex;
+  align-items: center;
+}
+
+.preview-playing-card {
+  width: 68px;
+  height: 96px;
+  border-radius: 10px;
+  background: radial-gradient(circle, #263a33 0%, #15221d 100%);
+  border: 1.5px solid #f5c85b;
+  color: #f5c85b;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 22px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.35);
+  transition: all 0.3s ease;
+}
+
+.card-left { transform: rotate(-12deg) translateX(14px); }
+.card-center { transform: translateY(-6px); z-index: 2; }
+.card-right { transform: rotate(12deg) translateX(-14px); }
+
+.stage-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #545e57;
+  margin-top: 12px;
+}
+
+.reset-preview-btn {
+  border: 1px solid rgba(24, 34, 29, 0.2);
+  background: #fff9ed;
+  padding: 4px 11px;
+  border-radius: 12px;
+  font-family: "Oswald", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =========================================================
+   DEDICATED AD-FREE PASSES BANNER (₹10 TODAY / ₹50 7-DAYS)
+========================================================= */
+.adfree-passes-banner {
+  background: rgba(255, 251, 240, 0.90);
+  border: 2px solid rgba(24, 34, 29, 0.16);
+  border-radius: 24px;
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 28px;
+  box-shadow: 0 16px 38px rgba(24, 34, 29, 0.08);
+}
+
+.adfree-info h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 34px;
+  letter-spacing: 1px;
+  line-height: 1;
+  margin: 3px 0 6px;
+}
+
+.adfree-info p {
+  font-size: 12.5px;
+  color: #545e57;
+  line-height: 1.45;
+}
+
+.adfree-options-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.adfree-option-card {
+  background: #fff9ed;
+  border: 1.5px solid rgba(24, 34, 29, 0.15);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.adfree-option-card.weekly-highlight {
+  border-color: #d49a1a;
+  background: linear-gradient(135deg, #fffdf7, #f9f0d8);
+}
+
+.af-badge {
+  display: inline-block;
+  font-family: "Oswald", sans-serif;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  background: #2e7d5b;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.af-badge.gold {
+  background: #d49a1a;
+  color: #141c18;
+}
+
+.adfree-option-card h3 {
+  font-family: "Oswald", sans-serif;
+  font-size: 18px;
+}
+
+.adfree-option-card small {
+  display: block;
+  font-size: 11px;
+  color: #545e57;
+  line-height: 1.35;
+  margin-top: 3px;
+}
+
+/* =========================================================
+   CATEGORY FILTER TABS
+========================================================= */
+.store-filter-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.filter-pill {
+  border: 1.5px solid rgba(24, 34, 29, 0.16);
+  background: rgba(255, 250, 238, 0.82);
+  color: #18221d;
+  padding: 9px 18px;
+  border-radius: 24px;
+  font-family: "Oswald", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.filter-pill.active {
+  background: #18221d;
+  color: #f5c85b;
+  border-color: #18221d;
+}
+
+/* =========================================================
+   STORE CATALOG SECTION
+========================================================= */
+.store-catalog-section {
+  margin-bottom: 42px;
+}
+
+.catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid rgba(24, 34, 29, 0.12);
+}
+
+.cat-eyebrow {
+  font-family: "Oswald", sans-serif;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: #2e7d5b;
+}
+
+.catalog-header h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 34px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.catalog-header small {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #5c665f;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 18px;
+}
+
+.armory-item-card {
+  background: rgba(255, 251, 240, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(24, 34, 29, 0.15);
+  border-radius: 22px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: 0 14px 32px rgba(24, 34, 29, 0.08);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.armory-item-card:hover {
+  transform: translateY(-4px);
+  border-color: #18221d;
+}
+
+.armory-item-card.owned-card {
+  border-color: #2e7d5b;
+  background: rgba(240, 252, 246, 0.92);
+}
+
+.item-visual-box {
+  height: 110px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1b2822, #111915);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.item-tier-badge {
+  position: absolute;
+  top: 9px;
+  left: 10px;
+  font-family: "Oswald", sans-serif;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(245, 200, 91, 0.18);
+  color: #f5c85b;
+  border: 1px solid rgba(245, 200, 91, 0.35);
+}
+
+.item-price-pill {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  font-family: "Oswald", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: #f5c85b;
+  color: #141c18;
+}
+
+.item-price-pill.token-pill {
+  background: #2e7d5b;
+  color: #ffffff;
+}
+
+.mini-frame-demo {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #26352e;
+  display: grid;
+  place-items: center;
+  color: #faf3df;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 18px;
+}
+
+.mini-deck-demo {
+  width: 48px;
+  height: 68px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 16px;
+}
+
+.item-info h3 {
+  font-family: "Oswald", sans-serif;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.item-info p {
+  font-size: 11.5px;
+  color: #545e57;
+  line-height: 1.4;
+}
+
+.item-btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-try {
+  border: 1.5px solid rgba(24, 34, 29, 0.2);
+  background: #fff9ed;
+  color: #18221d;
+  padding: 10px 12px;
+  border-radius: 11px;
+  font-family: "Oswald", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-buy-item {
+  flex: 1;
+  border: 0;
+  background: #18221d;
+  color: #fff3cd;
+  padding: 10px 14px;
+  border-radius: 11px;
+  font-family: "Oswald", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+}
+
+.btn-buy-item.equipped-state {
+  background: #2e7d5b;
+  color: #ffffff;
+}
+
+.hidden { display: none !important; }
+.modal { position: fixed; inset: 0; display: grid; place-items: center; padding: 16px; z-index: 9999; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(14, 20, 17, 0.78); backdrop-filter: blur(10px); }
+.modal-box {
+  position: relative; z-index: 2; width: min(420px, 100%);
+  background: #f4ead5; border: 2.5px solid #d4aa36; border-radius: 26px;
+  padding: 28px; text-align: center; box-shadow: 0 30px 75px rgba(0,0,0,0.5);
+}
+.crate-burst-icon { font-size: 56px; margin: 10px 0; }
+.modal-box h2 { font-family: "Bebas Neue", sans-serif; font-size: 36px; margin-bottom: 6px; }
+.modal-box p { font-size: 13px; color: #4f5952; }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 20px);
+  background: #18221d; color: #fff3cd; padding: 11px 22px; border-radius: 20px;
+  font-size: 12px; font-weight: 800; opacity: 0; pointer-events: none; transition: .25s; z-index: 10000;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* =========================================================
+   STRICT MOBILE RESPONSIVE FIX (PERFECT SCALING)
+========================================================= */
+@media (max-width: 900px) {
+  html, body {
+    height: 100dvh;
+    overflow-y: auto;
+  }
+  
+  /* TOP BAR SCALED FOR MOBILE */
+  .topbar {
+    padding: 8px 3vw;
+    height: auto;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .store-brand-head { gap: 6px; }
+  .brand-store-icon { width: 22px; height: 22px; }
+  .store-title { font-size: 16px; white-space: nowrap; }
+  .store-sub { font-size: 6px; white-space: nowrap; letter-spacing: 1px; }
+  
+  .top-right-actions { gap: 6px; }
+  .nav-pill-btn { padding: 4px 6px; font-size: 8px; gap: 4px; white-space: nowrap; }
+  .wallet-pill { padding: 3px 6px 3px 8px; font-size: 10px; gap: 4px; }
+  .coin-icon { width: 12px; height: 12px; }
+  .wallet-plus-btn { padding: 3px 6px; font-size: 7px; }
+  
+  .store-page-shell {
+    padding: 12px 3vw 60px;
+    width: 100%;
+  }
+
+  .store-hero-grid, .adfree-passes-banner { 
+    grid-template-columns: 1fr; 
+    gap: 12px; 
+    margin-bottom: 16px; 
+  }
+  
+  /* VIP SHOWCASE MOBILE */
+  .vip-showcase-card { padding: 12px; border-radius: 16px; }
+  .vip-showcase-card h1 { font-size: 22px; letter-spacing: 0.5px; margin: 4px 0; }
+  .vip-eyebrow { font-size: 7.5px; padding: 3px 8px; margin-bottom: 2px; }
+  .vip-lead { font-size: 9px; margin: 6px 0 8px; line-height: 1.35; }
+  
+  .vip-perks-list { grid-template-columns: 1fr; gap: 6px; margin-bottom: 10px; }
+  .vip-perks-list li { padding: 6px 8px; gap: 8px; border-radius: 10px; }
+  .perk-bullet { width: 14px; height: 14px; font-size: 8px; }
+  .vip-perks-list strong { font-size: 10px; }
+  .vip-perks-list small { font-size: 8px; line-height: 1.25; }
+  
+  .vip-plans-grid { grid-template-columns: 1fr; gap: 8px; }
+  .vip-plan-box { padding: 10px; border-radius: 12px; gap: 4px; }
+  .plan-duration { font-size: 9px; }
+  .plan-price { font-size: 20px; }
+  .vip-plan-box small { font-size: 8px; margin-bottom: 4px; }
+  .vip-buy-btn { padding: 8px 12px; font-size: 10px; border-radius: 10px; }
+  .vip-preview-btn { padding: 6px 12px; font-size: 9px; border-radius: 10px; }
+  .plan-save-ribbon { font-size: 7px; padding: 2px 6px; top: -8px; right: 8px; }
+
+  /* DRESSING ROOM MOBILE */
+  .live-preview-stage { padding: 12px; border-radius: 16px; }
+  .stage-head { margin-bottom: 10px; }
+  .stage-head h2 { font-size: 15px; }
+  .stage-head small { font-size: 7px; }
+  .stage-item-label { font-size: 8px; padding: 3px 8px; }
+  
+  .stage-table-felt { min-height: 120px; padding: 10px; border-radius: 14px; gap: 8px; }
+  .stage-avatar-ring { width: 44px; height: 44px; border-width: 2px; }
+  .stage-name-line { font-size: 12px; }
+  .stage-callsign-badge { font-size: 7px; padding: 2px 6px; margin-top: 2px; }
+  
+  /* VERIFIED TICK RESIZED FOR MOBILE */
+  #previewPinnedTick .zh-avatar-tick-pin {
+    width: 14px !important;
+    height: 14px !important;
+    bottom: -2px !important;
+    right: -2px !important;
+  }
+  
+  .preview-playing-card { width: 34px; height: 48px; font-size: 12px; border-radius: 5px; border-width: 1px; }
+  .card-left { transform: rotate(-12deg) translateX(8px); }
+  .card-center { transform: translateY(-4px); }
+  .card-right { transform: rotate(12deg) translateX(-8px); }
+  
+  .stage-foot { font-size: 8px; margin-top: 10px; }
+  .reset-preview-btn { font-size: 8px; padding: 4px 8px; border-radius: 8px; }
+
+  /* AD FREE BANNER */
+  .adfree-passes-banner { padding: 14px; border-radius: 16px; gap: 12px; }
+  .adfree-info h2 { font-size: 20px; }
+  .adfree-info p { font-size: 10px; }
+  .adfree-option-card { padding: 10px; border-radius: 14px; gap: 8px; }
+  .adfree-option-card h3 { font-size: 12px; }
+  .adfree-option-card small { font-size: 8px; }
+  .af-badge { font-size: 7px; padding: 2px 6px; }
+  .btn-buy-item { padding: 8px; font-size: 9px; border-radius: 10px; }
+
+  /* EXACTLY 4 BOXES PER ROW IN CATALOG */
+  .catalog-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  
+  .armory-item-card {
+    padding: 8px;
+    gap: 6px;
+    border-radius: 14px;
+  }
+  
+  .item-visual-box { height: 55px; border-radius: 10px; }
+  .item-tier-badge { font-size: 5.5px; padding: 2px 4px; top: 3px; left: 3px; border-radius: 5px; }
+  .item-price-pill { font-size: 6.5px; padding: 2px 4px; top: 3px; right: 3px; border-radius: 5px; }
+  
+  .mini-frame-demo { width: 32px; height: 32px; font-size: 11px; }
+  .mini-deck-demo { width: 22px; height: 32px; font-size: 11px; border-radius: 4px; }
+  
+  .item-info { margin-top: 4px !important; }
+  .item-info h3 { font-size: 8.5px; margin-bottom: 2px; letter-spacing: 0; }
+  .item-info p { font-size: 6.5px; line-height: 1.2; }
+  
+  .item-btn-row { flex-direction: column; gap: 4px; }
+  .btn-try { padding: 5px; font-size: 7.5px; border-radius: 8px; }
+  
+  /* FILTERS */
+  .store-filter-bar { gap: 6px; margin-bottom: 16px; }
+  .filter-pill { padding: 6px 10px; font-size: 8px; border-radius: 14px; white-space: nowrap; }
+  
+  .catalog-header h2 { font-size: 20px; }
+  .cat-eyebrow { font-size: 7px; }
+  .catalog-header small { font-size: 8px; }
+}

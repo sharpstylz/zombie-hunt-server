@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZOMBIE HUNT — Online Battle Arena</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="online-game.css">
+
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../supabase-client.js"></script>
+
+  <script src="../../monetization-config.js"></script>
+</head>
+
+<body>
+  <div class="grain"></div>
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+  <div class="bg-orb orb-three"></div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn forfeit-btn" id="forfeitBtn" type="button">
+        <span>🏳</span>
+        <b>FORFEIT</b>
+      </button>
+
+      <div class="hud-badge" id="hudMatchBadge">
+        <span>●</span>
+        <strong id="hudMatchText">LIVE ARENA • SYNCED</strong>
+      </div>
+    </div>
+
+    <!-- 90 SECONDS TURN CLOCK + 1v1 LIVE VOICE CONTROLS -->
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="game-turn-clock" style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.85);border:1px solid var(--line);padding:4px 12px;border-radius:20px;">
+        <span style="font-size:12px;">⏳</span>
+        <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.05em;" id="turnTimerText">01:30</span>
+      </div>
+
+      <button type="button" id="arenaMicBtn" style="border:1px solid var(--line);background:#fff;padding:5px 10px;border-radius:16px;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;cursor:pointer;" title="Talk to your 1v1 Opponent">
+        🎙️ MIC OFF
+      </button>
+      <button type="button" id="arenaSpeakerBtn" style="border:1px solid var(--line);background:#fff;padding:5px 10px;border-radius:16px;font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;cursor:pointer;" title="Mute/Unmute Opponent Audio">
+        🔊 AUDIO ON
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <div class="round-box">
+        <small>ROUND</small>
+        <strong id="roundNumber">1</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN GAMEPLAY LAYOUT -->
+  <main class="game-layout" style="position:relative;z-index:5;">
+    <aside class="side-panel">
+      <div class="panel-card">
+        <div class="panel-heading">
+          <div>
+            <small>LIVE MATCH</small>
+            <h2>STATUS</h2>
+          </div>
+          <span class="live-dot" id="arenaConnectionDot">● LIVE</span>
+        </div>
+
+        <button class="info-button" id="eliminatedBtn" type="button">
+          <span>☠</span>
+          <div>
+            <strong>ALL TEAMS STATUS</strong>
+            <small>View tournament combatants</small>
+          </div>
+          <b>›</b>
+        </button>
+
+        <div class="team-status">
+          <div class="status-title">
+            <span>YOUR SQUAD</span>
+            <b id="sideSquadName">TEAM B</b>
+          </div>
+          <div class="team-members" id="teamMembers"></div>
+        </div>
+
+        <!-- 1v1 ISOLATED DUEL CHAT BOX -->
+        <div id="arenaDuelChatSection" style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px;">
+          <small style="font-size:8px;font-weight:800;color:var(--muted);letter-spacing:0.08em;display:block;margin-bottom:4px;">💬 1v1 DUEL CHAT (OPPONENT ONLY)</small>
+          <div id="arenaDuelChatLog" style="height:74px;overflow-y:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px;font-size:10px;margin-bottom:6px;">
+            <div style="color:#8c8270;">Convince or bluff your rival before locking cards...</div>
+          </div>
+          <form id="arenaDuelChatForm" style="display:flex;gap:4px;">
+            <input type="text" id="arenaDuelChatInput" maxlength="100" placeholder="Message opponent..." style="flex:1;padding:6px 8px;border-radius:8px;border:1px solid var(--line);font-size:10px;">
+            <button type="submit" style="border:0;background:var(--blue-dark);color:#fff;padding:0 10px;border-radius:8px;font-size:9px;font-weight:800;cursor:pointer;">SEND</button>
+          </form>
+        </div>
+      </div>
+    </aside>
+
+    <section class="battle-area">
+      <div class="opponent-area">
+        <div class="character-side opponent-side">
+          <button class="profile-avatar" id="opponentProfile" type="button">
+            <img id="opponentImage" src="../../profile/avatars/char2.jpg" alt="Opponent">
+            <span class="online-dot"></span>
+          </button>
+          <div class="character-info">
+            <span class="team-label" id="opponentTeamLabel">TEAM A • OPPONENT</span>
+            <strong id="opponentName">SEARCHING RIVAL...</strong>
+            <small id="opponentSub">ONLINE RIVAL</small>
+          </div>
+        </div>
+
+        <div class="opponent-hand" id="opponentHand"></div>
+      </div>
+
+      <div class="table-zone">
+        <div class="suit-banner" id="suitBanner">
+          <span class="suit-icon" id="suitIcon">♥</span>
+          <div>
+            <small>CURRENT SUIT</small>
+            <strong id="currentSuit">HEARTS</strong>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="table-inner">
+            <div class="table-center-mark">ZH</div>
+            <div class="played-cards opponent-played" id="opponentPlayed"></div>
+
+            <div class="center-status" id="centerStatus">
+              <small id="statusRoundLabel">ROUND 1</small>
+              <strong id="statusActionLabel">CHOOSE YOUR CARDS</strong>
+            </div>
+
+            <div class="played-cards player-played" id="playerPlayed"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="totals-board hidden" id="totalsBoard">
+        <div class="total-side">
+          <span>OPPONENT TOTAL</span>
+          <strong id="opponentTotal">0</strong>
+          <small>CURRENT SUIT POINTS</small>
+        </div>
+        <div class="total-vs">VS</div>
+        <div class="total-side">
+          <span>YOUR TOTAL</span>
+          <strong id="playerTotal">0</strong>
+          <small>CURRENT SUIT POINTS</small>
+        </div>
+      </div>
+
+      <div class="player-area">
+        <div class="player-card-row">
+          <button class="open-cards-btn" id="openCardsBtn" type="button">
+            <div class="card-preview" id="cardPreview"></div>
+            <div class="open-cards-label">
+              <strong>YOUR CARDS</strong>
+              <small>Tap to choose</small>
+            </div>
+            <span>›</span>
+          </button>
+
+          <div class="character-side player-side">
+            <button class="profile-avatar" id="playerProfile" type="button">
+              <img id="playerImage" src="../../profile/avatars/char1.jpg" alt="You">
+              <span class="online-dot"></span>
+            </button>
+            <div class="character-info">
+              <span class="team-label" id="playerTeamLabel">TEAM B • YOU</span>
+              <strong id="playerName">SURVIVOR</strong>
+              <small id="playerZombieBadge">SQUAD MEMBER</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <span class="selection-count" id="selectionCount">0 SELECTED</span>
+          <button class="lock-btn" id="lockBtn" type="button" disabled>LOCK CARDS</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- CARD SELECTION MODAL -->
+  <div class="modal hidden" id="cardModal">
+    <div class="modal-backdrop" id="closeCardBackdrop"></div>
+    <section class="card-modal-box">
+      <button class="modal-close" id="closeCardModal" type="button">×</button>
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">SELECT DECK</span>
+          <h2>CHOOSE CARDS TO PLAY</h2>
+        </div>
+        <div class="modal-suit">
+          <span id="modalSuitIcon">♥</span>
+          <small id="modalSuit">HEARTS</small>
+        </div>
+      </div>
+
+      <p class="selection-help">Pick active suit number cards to score points (unclaimed cards stay in your hand for next rounds!), or choose 1 tactical special card.</p>
+      <div class="selection-grid" id="selectionGrid"></div>
+
+      <div class="modal-footer">
+        <div>
+          <strong id="modalSelectedCount">0</strong>
+          <span>SELECTED</span>
+        </div>
+        <button class="modal-lock-btn" id="modalLockBtn" type="button" disabled>LOCK SELECTION</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- RESULT MODAL -->
+  <div class="modal hidden" id="resultModal">
+    <div class="modal-backdrop"></div>
+    <section class="result-modal">
+      <div class="result-word" id="resultWord">VICTORY</div>
+      <span class="result-line">ROUND CONCLUDED</span>
+      <h2 id="resultWinner">SURVIVOR</h2>
+      <p id="resultDescription">Round decided.</p>
+
+      <div class="claim-section hidden" id="claimSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h3>CLAIM ONE NUMBER CARD</h3>
+          <span id="claimTimerBadge" style="font-size:9px;font-weight:800;background:#24221e;color:#f5c85b;padding:2px 8px;border-radius:10px;">AUTO-CLAIM IN 10s</span>
+        </div>
+        <div class="claim-cards" id="claimCards"></div>
+      </div>
+
+      <button class="continue-btn" id="continueBtn" type="button">PROCEED TO SQUAD ROOM →</button>
+    </section>
+  </div>
+
+  <!-- FORFEIT CONFIRMATION MODAL -->
+  <div class="modal hidden" id="forfeitModal" style="z-index: 9999;">
+    <div class="modal-backdrop" id="closeForfeitBackdrop"></div>
+    <section class="modal-box rename-box" style="position:relative;z-index:10000;text-align:center;max-width:380px;background:#fffdfa;border:2px solid #e95c54;">
+      <span class="modal-eyebrow" style="color:#d44a42;font-weight:900;">SURRENDER COMBAT</span>
+      <h2 style="margin:4px 0 8px;font-family:'Oswald',sans-serif;font-size:22px;">FORFEIT SECTOR DUEL?</h2>
+      <p style="font-size:11px;color:var(--muted);line-height:1.5;">You will be immediately eliminated from the match and return to homepage. If your squad wins the tournament, your bounty share will still be awarded.</p>
+      <div class="modal-btn-row" style="justify-content:center;gap:12px;margin-top:16px;">
+        <button type="button" class="btn-cancel" id="cancelForfeitBtn">CANCEL</button>
+        <button type="button" class="btn-confirm" id="confirmForfeitBtn">CONFIRM FORFEIT</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- GRAND TOURNAMENT CHAMPIONS MODAL -->
+  <div class="modal hidden" id="tournamentVictoryModal" style="z-index: 10000;">
+    <div class="modal-backdrop"></div>
+    <section class="modal-box result-modal" style="position:relative;z-index:10001;text-align:center;max-width:440px;border:2.5px solid #c9932b;background:#fdfaf3;">
+      <div style="font-size:46px;line-height:1;margin-bottom:6px;">🏆</div>
+      <div class="result-word" style="color:#a37217;font-size:44px;letter-spacing:0.04em;">CHAMPIONS</div>
+      <span class="result-line" style="color:#2c755f;font-weight:800;font-size:9px;">TOURNAMENT WON • ALL RIVALS WIPED</span>
+      <h2 id="champSquadTitle" style="font-family:'Oswald',sans-serif;font-size:26px;margin:4px 0 8px;">TEAM ALPHA</h2>
+      <p id="champPoolSub" style="font-size:11px;color:var(--muted);margin-bottom:14px;">Total match bounty pool has been unlocked and equally credited across squad members.</p>
+
+      <div style="background:white;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;">
+        <span style="font-size:9px;font-weight:800;color:var(--muted);letter-spacing:0.08em;display:block;margin-bottom:6px;">SQUAD BOUNTY DISTRIBUTION</span>
+        <div id="champDistributionList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+
+      <button class="continue-btn" id="doubleOnlineWinAdBtn" type="button" style="background:#c28c17;margin-bottom:8px;">WATCH AD FOR +2,000 BONUS TOKENS</button>
+      <button class="continue-btn" id="finishTournamentBtn" type="button" style="background:#2c755f;">CLAIM BOUNTY & RETURN TO HUB →</button>
+    </section>
+  </div>
+
+  <!-- ELIMINATED MODAL -->
+  <div class="modal hidden" id="eliminatedModal">
+    <div class="modal-backdrop" id="closeEliminatedBackdrop"></div>
+    <section class="status-modal">
+      <button class="modal-close" id="closeEliminated" type="button">×</button>
+      <span class="eyebrow">TOURNAMENT COMBATANTS</span>
+      <h2>ALL TEAMS STATUS</h2>
+      <div class="eliminated-list" id="eliminatedList"></div>
+    </section>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div class="modal hidden" id="profileModal">
+    <div class="modal-backdrop" id="closeProfileBackdrop"></div>
+    <section class="profile-modal">
+      <button class="modal-close" id="closeProfile" type="button">×</button>
+      <div class="profile-popup-avatar">
+        <img id="popupAvatar" src="../../profile/avatars/char1.jpg" alt="Profile">
+      </div>
+      <span class="eyebrow" id="popupTeam">TEAM B</span>
+      <h2 id="popupName">SURVIVOR</h2>
+
+      <div class="social-stats">
+        <div class="social-stat">
+          <small>FOLLOWERS</small>
+          <strong id="popupFollowers">1,280</strong>
+        </div>
+        <div class="social-stat">
+          <small>BOUNTY TOKENS</small>
+          <strong id="popupBounty">4,500 TOKENS</strong>
+        </div>
+        <div class="social-stat" style="grid-column: span 2;">
+          <small>SURVIVAL INDEX (S.I.)</small>
+          <strong id="popupSI">3.00 (VETERAN)</strong>
+        </div>
+      </div>
+
+      <button type="button" id="arenaFollowBtn" class="continue-btn" style="margin-top:12px;background:#2e7d5b;">+ FOLLOW OPERATIVE</button>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="online-game.js"></script>
+</body>
+</html>

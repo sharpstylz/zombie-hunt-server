@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ZOMBIE HUNT — Survival Card Arena</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+
+  <script src="monetization-config.js"></script>
+</head>
+
+<body>
+  <div class="grain"></div>
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+  <div class="bg-orb orb3"></div>
+  <div class="bg-orb orb4"></div>
+
+  <!-- =====================================================
+       TOP NAVIGATION BAR (WITH @USERNAME SEARCH & INBOX)
+  ====================================================== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" id="brandLogoSecretTap" aria-label="Zombie Hunt logo">
+        <img src="icons/game-logo.png" alt="Logo" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+        <svg viewBox="0 0 64 64" class="zombie-logo" style="display:none;">
+          <path d="M15 25C14 15 23 8 32 9C43 9 51 17 50 28L48 45C47 52 40 56 32 55C23 56 17 51 16 44Z"/>
+          <path class="brain" d="M22 17C24 12 28 11 30 15C33 10 37 11 38 15C42 12 46 16 44 20"/>
+          <circle cx="24" cy="29" r="5"/>
+          <circle cx="40" cy="29" r="5"/>
+          <path d="M23 42C28 46 37 46 42 41"/>
+          <path class="scar" d="M32 21L30 36"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">ZOMBIE <i>HUNT</i></div>
+        <div class="brand-sub">SURVIVAL CARD ARENA</div>
+      </div>
+    </div>
+
+    <div class="top-hub-actions">
+      <!-- BOUNTY WALLET -->
+      <div class="wallet-pill">
+        <img src="icons/bounty-token.png" alt="Coin" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+        <svg viewBox="0 0 24 24" class="nav-svg coin-svg" style="display:none;">
+          <circle cx="12" cy="12" r="9" fill="#f5c85b" stroke="#b38618" stroke-width="2"/>
+          <path d="M9 9h6l-6 6h6" stroke="#18201c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <strong id="homeTokenBalance">5,000</strong>
+        <button type="button" class="wallet-plus-btn" id="freeTokensAdBtn" title="Watch Video Ad for +2,000 Tokens">+FREE</button>
+      </div>
+
+      <!-- PLAYER SEARCH BUTTON (@USERNAME / DISPLAY NAME) -->
+      <button type="button" class="hub-icon-btn" id="openSearchModalBtn" title="Search Players by @username or Name">
+        <svg viewBox="0 0 24 24" class="nav-svg">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m20 20-3.5-3.5"/>
+        </svg>
+        <span>SEARCH</span>
+      </button>
+
+      <!-- INTERACTIVE 5-CHAPTER GUIDE -->
+      <button type="button" class="hub-icon-btn" id="openGuideBtn" title="Interactive How to Play Walkthrough">
+        <img src="icons/icon-guide.png" alt="Guide" style="width:17px;height:17px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+        <svg viewBox="0 0 24 24" class="nav-svg" style="display:none;">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span>GUIDE</span>
+      </button>
+
+      <!-- 7-DAY STRICT DAILY STREAK -->
+      <button type="button" class="hub-icon-btn" id="openDailyBtn" title="7-Day Supply Drop">
+        <img src="icons/icon-daily.png" alt="Daily" style="width:17px;height:17px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+        <svg viewBox="0 0 24 24" class="nav-svg" style="display:none;">
+          <rect x="3" y="8" width="18" height="13" rx="2"/>
+          <path d="M12 8v13M3 12h18M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>
+        </svg>
+        <span>DAILY</span>
+      </button>
+
+      <!-- FULL-PAGE STORE WORLD -->
+      <button type="button" class="hub-icon-btn store-highlight" id="openStoreBtn" title="Open Full-Page Armory & VIP Store">
+        <img src="icons/icon-store.png" alt="Store" style="width:17px;height:17px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+        <svg viewBox="0 0 24 24" class="nav-svg" style="display:none;">
+          <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+        <span>STORE</span>
+      </button>
+
+      <!-- FULL-PAGE DIRECT MESSAGES & REQUEST INBOX -->
+      <button type="button" class="hub-icon-btn" id="openMessagesHubBtn" title="Direct Messages & Stealth Requests">
+        <img src="icons/icon-messages.png" alt="Messages" style="width:17px;height:17px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+        <svg viewBox="0 0 24 24" class="nav-svg" style="display:none;">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+        <span>INBOX</span>
+      </button>
+
+      <!-- FULL-PAGE INSTAGRAM-STYLE PROFILE -->
+      <button class="profile-btn" id="profileBtn" type="button">
+        <div class="avatar" id="avatarMini" style="position:relative;">
+          <img id="homeAvatarImage" src="profile/avatars/char1.jpg" alt="Profile">
+        </div>
+        <span id="homeProfileName" class="profile-name-home">Survivor</span>
+        <b>›</b>
+      </button>
+    </div>
+  </header>
+
+  <!-- =====================================================
+       MAIN HERO & LIVE ARENA PREVIEW
+  ====================================================== -->
+  <main id="home" class="home">
+    <section class="hero">
+      <div class="eyebrow">
+        <span></span>
+        4 SQUADS • COVERT INFECTION • LIVE VOICE
+      </div>
+
+      <h1>
+        <span>ZOMBIE</span>
+        <strong>HUNT</strong>
+      </h1>
+
+      <p class="hero-copy">
+        Read the cards. Outbluff your rival. Survive the hunt.
+      </p>
+
+      <div class="mode-grid">
+        <button class="mode-card online selected" id="onlineBtn" type="button">
+          <div class="mode-icon">
+            <img src="icons/mode-online.png" alt="Online" style="width:30px;height:30px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+            <svg viewBox="0 0 24 24" class="mode-svg" style="display:none;">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+            </svg>
+          </div>
+          <div class="mode-text">
+            <small>REAL PLAYERS</small>
+            <h2>MULTIPLAYER</h2>
+            <p>4P • 8P • 16P • Friends</p>
+          </div>
+          <div class="mode-arrow">↗</div>
+          <div class="selected-check">✓</div>
+        </button>
+
+        <button class="mode-card bots" id="botBtn" type="button">
+          <div class="mode-icon">
+            <img src="icons/mode-bots.png" alt="Bots" style="width:30px;height:30px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+            <svg viewBox="0 0 24 24" class="mode-svg" style="display:none;">
+              <rect x="4" y="6" width="16" height="12" rx="3"/>
+              <circle cx="9" cy="12" r="1.5"/>
+              <circle cx="15" cy="12" r="1.5"/>
+              <path d="M12 2v4M8 22h8"/>
+            </svg>
+          </div>
+          <div class="mode-text">
+            <small>WIN +1,000</small>
+            <h2>VS AI BOTS</h2>
+            <p>16-Player Offline Arena</p>
+          </div>
+          <div class="mode-arrow">↗</div>
+          <div class="selected-check">✓</div>
+        </button>
+      </div>
+
+      <button class="arena-btn" id="arenaBtn" type="button">
+        <span>ENTER THE ARENA</span>
+        <b>→</b>
+      </button>
+
+      <div class="micro" id="authStatusMicro">
+        <span>●</span>
+        Search operatives by @username above to Follow, Message, or Invite to your Squad Room!
+      </div>
+    </section>
+
+    <aside class="scene">
+      <div class="scene-card">
+        <div class="scene-label">
+          <span>LIVE ARENA</span>
+          <span class="online-status">● ACTIVE</span>
+        </div>
+
+        <div class="table">
+          <div class="table-light"></div>
+          <div class="table-texture"></div>
+
+          <div class="card-stack left">
+            <div class="card c1">♥<b>7</b></div>
+            <div class="card c2">♣<b>4</b></div>
+            <div class="card c3">♦<b>9</b></div>
+          </div>
+
+          <div class="center-token">
+            <div class="token-face">
+              <svg viewBox="0 0 64 64">
+                <path d="M16 25C15 16 23 10 32 10C42 10 49 17 48 27L47 43C46 51 39 54 32 54C24 54 18 50 17 43Z"/>
+                <circle cx="24" cy="29" r="4"/>
+                <circle cx="40" cy="29" r="4"/>
+                <path d="M23 41C28 45 37 45 41 40"/>
+              </svg>
+            </div>
+            <small>HUNT</small>
+          </div>
+
+          <div class="card-stack right">
+            <div class="card dark d1">♠<b>?</b></div>
+            <div class="card dark d2">♠<b>?</b></div>
+            <div class="card dark d3">♠<b>?</b></div>
+          </div>
+        </div>
+
+        <div class="scene-foot">
+          <span>90s VOICE TURN</span>
+          <b>READY</b>
+        </div>
+      </div>
+
+      <div class="float-chip chip1">♥ <b>SUIT</b></div>
+      <div class="float-chip chip2">🎙️ <b>VOICE</b></div>
+      <div class="float-chip chip3">☣ <b>1 ZOMBIE</b></div>
+    </aside>
+  </main>
+
+  <!-- =====================================================
+       FULL-SCREEN CINEMATIC INTERACTIVE WALKTHROUGH GUIDE
+  ====================================================== -->
+  <div class="guide-theatre hidden" id="cinematicGuideScreen">
+    <div class="guide-theatre-topbar">
+      <div class="guide-chapter-pills" id="guideChapterPills">
+        <button type="button" class="ch-pill active" data-ch="0">01. SQUADS</button>
+        <button type="button" class="ch-pill" data-ch="1">02. SUITS</button>
+        <button type="button" class="ch-pill" data-ch="2">03. ZOMBIE</button>
+        <button type="button" class="ch-pill" data-ch="3">04. WEAPONS</button>
+        <button type="button" class="ch-pill" data-ch="4">05. SUMMARY</button>
+      </div>
+
+      <button type="button" class="guide-skip-btn" id="skipGuideBtn">
+        SKIP TO HOME ✕
+      </button>
+    </div>
+
+    <div class="guide-stage-wrap">
+      <div class="guide-visual-stage" id="guideVisualStage"></div>
+    </div>
+
+    <div class="guide-dialogue-bar">
+      <div class="guide-text-box" id="guideTextBox" title="Click to complete typing">
+        <span class="guide-chapter-tag" id="guideChapterTag">CHAPTER 01 / 05</span>
+        <h2 id="guideChapterTitle">THE 4-SQUAD ARENA</h2>
+        <p id="guideTypewriterText"></p>
+      </div>
+
+      <div class="guide-nav-Controls">
+        <button type="button" class="guide-prev-btn" id="prevGuideChapterBtn">← PREV</button>
+        <button type="button" class="guide-next-btn" id="nextGuideChapterBtn">NEXT CHAPTER →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       MODAL 1: ARENA FORMAT SELECTOR
+  ====================================================== -->
+  <div class="modal hidden" id="modeSizeModal">
+    <div class="modal-box wide-modal">
+      <button class="close" id="closeModeSizeModal" type="button">×</button>
+      <span class="modal-eyebrow">SELECT ARENA</span>
+      <h2>CHOOSE MODE</h2>
+
+      <div class="tier-cards-grid">
+        <div class="tier-option-card" data-size="4P">
+          <span class="tier-tag">2 SQUADS</span>
+          <h3>4P DUEL</h3>
+          <div class="tier-prize">POOL: <b>4,000</b></div>
+          <button type="button" class="tier-launch-btn">PLAY →</button>
+        </div>
+
+        <div class="tier-option-card" data-size="8P">
+          <span class="tier-tag">4 SQUADS</span>
+          <h3>8P CLASH</h3>
+          <div class="tier-prize">POOL: <b>8,000</b></div>
+          <button type="button" class="tier-launch-btn">PLAY →</button>
+        </div>
+
+        <div class="tier-option-card featured-tier" data-size="16P">
+          <span class="tier-tag">4 SQUADS</span>
+          <h3>16P ARENA</h3>
+          <div class="tier-prize">POOL: <b>16,000</b></div>
+          <button type="button" class="tier-launch-btn">PLAY →</button>
+        </div>
+      </div>
+
+      <div class="custom-room-bar">
+        <div class="custom-room-controls">
+          <input type="text" id="joinRoomCodeInput" maxlength="10" placeholder="ROOM CODE">
+          <button type="button" class="save-btn compact-btn" id="joinCustomRoomBtn">JOIN</button>
+          <button type="button" class="save-btn compact-btn gold-btn" id="createCustomRoomBtn">CREATE ROOM LINK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       MODAL 2: 7-DAY DAILY SUPPLY DROP
+  ====================================================== -->
+  <div class="modal hidden" id="dailyModal">
+    <div class="modal-box wide-modal">
+      <button class="close" id="closeDailyModal" type="button">×</button>
+      <span class="modal-eyebrow">CONSECUTIVE LOGIN STREAK • MISS 1 DAY = RESET TO DAY 1</span>
+      <h2>7-DAY SUPPLY DROP</h2>
+      <div class="daily-grid" id="dailyStreakGrid"></div>
+      <button type="button" class="save-btn" id="claimDailyBtn">CLAIM TODAY'S DROP</button>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       MODAL 3: GLOBAL PLAYER SEARCH (@USERNAME / DISPLAY NAME)
+  ====================================================== -->
+  <div class="modal hidden" id="playerSearchModal">
+    <div class="modal-box wide-modal" style="max-height:86vh;display:flex;flex-direction:column;">
+      <button class="close" id="closeSearchModalBtn" type="button">×</button>
+      <span class="modal-eyebrow">GLOBAL OPERATIVE DIRECTORY</span>
+      <h2>SEARCH PLAYERS BY @USERNAME</h2>
+
+      <div style="margin:10px 0 14px;">
+        <input type="text" id="homePlayerSearchInput" placeholder="Search @username or display name (e.g. @vikram_apex, Luna)..." autocomplete="off" style="width:100%;padding:12px 15px;border-radius:14px;border:1.5px solid #c6bba4;background:#fff9ed;font-size:13.5px;font-weight:700;outline:none;">
+      </div>
+
+      <div id="homeSearchResultsList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;text-align:left;padding-right:4px;"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

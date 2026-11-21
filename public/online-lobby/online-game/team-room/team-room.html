@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZOMBIE HUNT — Online Squad Command Room</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="team-room.css">
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="../../../monetization-config.js"></script>
+  
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../../supabase-client.js"></script>
+</head>
+
+<body>
+  <div class="grain"></div>
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+  <div class="bg-orb orb-three"></div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="back-btn" id="leaveGameBtn" type="button">
+      <span>←</span>
+      <b>LOBBY</b>
+    </button>
+
+    <div class="squad-brand">
+      <div class="brand-badge" id="squadBadge">B</div>
+      <div>
+        <h1 id="teamName">TEAM B</h1>
+        <small id="roomSubText">PRIVATE SQUAD VOICE & TEXT ROOM</small>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button type="button" id="squadMicBtn" style="border:1px solid var(--line);background:#fff;padding:6px 12px;border-radius:14px;font-family:'Oswald',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer;">
+        🎙️ SQUAD MIC OFF
+      </button>
+      <button type="button" id="squadSpeakerBtn" style="border:1px solid var(--line);background:#fff;padding:6px 10px;border-radius:14px;font-family:'Oswald',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer;">
+        🔊 AUDIO ON
+      </button>
+      <button type="button" id="openEnemySectorsBtn" style="border:1px solid var(--line);background:#24221e;color:#f5c85b;padding:6px 12px;border-radius:14px;font-family:'Oswald',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer;">
+        📡 ENEMY SECTORS
+      </button>
+      <div class="round-indicator">
+        <small id="roundLabel">ROUND 2</small>
+        <strong id="nextRound">2</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SQUAD-FIRST ROOM LAYOUT (80% FOCUS ON YOUR SQUAD & CHAT) -->
+  <main class="room-layout" style="position:relative;z-index:5;">
+    <div class="spectator-banner hidden" id="spectatorBanner">
+      <div class="banner-content">
+        <span class="banner-icon">👁</span>
+        <div>
+          <strong id="bannerTitle">YOU HAVE BEEN ELIMINATED</strong>
+          <p id="bannerSub">Talk to your squadmates here or watch their live duels.</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="room-columns" style="grid-template-columns: 1fr 1.35fr;">
+      <!-- LEFT: YOUR 4-PLAYER REAL SQUAD -->
+      <div class="panel-box">
+        <div class="panel-header">
+          <div>
+            <span class="panel-eyebrow">YOUR PRIVATE SQUAD (ISOLATED VOICE)</span>
+            <h2>SQUAD MEMBERS</h2>
+          </div>
+          <span class="panel-badge"><b id="onlineCount">0</b> ALIVE</span>
+        </div>
+
+        <div class="team-grid" id="teamGrid"></div>
+
+        <div class="auto-ready-box">
+          <div class="auto-ready-info">
+            <strong>AUTO-DEPLOY TO ARENA</strong>
+            <small>Automatically ready up after 3s cooldown</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="autoReadyToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- RIGHT: LARGE ENCRYPTED SQUAD CHAT & VOICE COMMS -->
+      <div class="panel-box chat-section">
+        <div class="panel-header">
+          <div>
+            <span class="panel-eyebrow">ENCRYPTED SQUAD CHANNEL (HIDDEN FROM OTHER TEAMS)</span>
+            <h2>SQUAD TACTICAL CHAT & VOICE</h2>
+          </div>
+          <span class="live-status">● TEAM ONLY</span>
+        </div>
+
+        <div class="chat-messages" id="chatMessages" style="height:260px;"></div>
+
+        <form class="chat-input-row" id="chatForm">
+          <input type="text" id="chatInput" placeholder="Tell your squad who is Zombie or plan next move..." maxlength="150" autocomplete="off" required>
+          <button type="submit" class="send-btn">SEND →</button>
+        </form>
+      </div>
+    </section>
+
+    <footer class="room-footer">
+      <button class="leave-btn-left" id="leaveBottomBtn" type="button">LEAVE MATCH</button>
+
+      <div class="footer-btn-row">
+        <button class="action-btn-green" id="actionBtn" type="button" disabled>
+          <span id="actionBtnText">WAIT (3s)</span>
+        </button>
+      </div>
+    </footer>
+  </main>
+
+  <!-- COMPACT DRAWER MODAL: ALL TEAMS STATUS & SURVEILLANCE -->
+  <div class="modal hidden" id="enemySectorsModal">
+    <div class="modal-backdrop" id="closeEnemySectorsBackdrop"></div>
+    <section class="modal-box" style="width:min(95vw, 520px);">
+      <button class="modal-close" id="closeEnemySectorsBtn" type="button">×</button>
+      <span class="modal-eyebrow">SURVIVAL BRACKETS</span>
+      <h2 style="font-family:'Oswald',sans-serif;margin-bottom:8px;">ALL TEAMS STATUS</h2>
+      <small style="font-size:8.5px;color:var(--muted);display:block;margin-bottom:8px;">Tap any squad to inspect operatives or watch live duels:</small>
+      <div class="standings-grid" id="standingsGrid"></div>
+
+      <div class="intel-summary-box">
+        <div class="intel-header">
+          <span>☣ TOURNAMENT SURVEILLANCE</span>
+          <strong id="intelCount">0</strong>
+        </div>
+        <div class="known-list" id="knownList"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL 1: TEAM ROSTER POPUP -->
+  <div class="modal hidden" id="teamModal">
+    <div class="modal-backdrop" id="closeModalBackdrop"></div>
+    <section class="modal-box roster-box">
+      <button class="modal-close" id="closeTeamModal" type="button">×</button>
+      <span class="modal-eyebrow">SECTOR RECON</span>
+      <h2 id="modalTeamTitle">TEAM ROSTER</h2>
+      <div class="roster-list" id="rosterList"></div>
+    </section>
+  </div>
+
+  <!-- MODAL 2: WAITING BARRIER POPUP -->
+  <div class="modal hidden" id="waitingBarrierModal">
+    <div class="modal-backdrop"></div>
+    <section class="modal-box matchmaking-box">
+      <div class="mm-pulse">⏳</div>
+      <h2 id="waitingBarrierTitle">SYNCHRONIZING COMBATANTS</h2>
+      <p id="waitingBarrierDesc">Waiting for active sector duels to finish and operatives to assemble...</p>
+      <div class="ready-tally-badge" style="margin:10px auto;background:white;border:1px solid var(--line);border-radius:12px;padding:8px 16px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;width:fit-content;">
+        OPERATIVES READY: <span id="readyCountDisplay" style="color:#2c755f;">0 / 16</span>
+      </div>
+      <div class="pairings-list" id="readyPlayersList" style="max-height:220px;overflow-y:auto;"></div>
+      <div class="mm-footer">
+        <span class="timer-badge" id="waitingStatusBadge">SECTOR DUELS IN PROGRESS</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL 3: MATCHMAKING PAIRINGS GATEWAY -->
+  <div class="modal hidden" id="matchmakingModal">
+    <div class="modal-backdrop"></div>
+    <section class="modal-box matchmaking-box">
+      <div class="mm-pulse">⚔</div>
+      <h2 id="matchmakingTitle">DEPLOYING TO ARENA</h2>
+      <p id="matchmakingDesc">All operatives assembled. Targets locked via priority protocol...</p>
+      <div class="pairings-list" id="pairingsList"></div>
+      <div class="mm-footer">
+        <span class="timer-badge" id="autoTimer">LAUNCH IN: 3s</span>
+        <button class="start-btn" id="startBattleBtn" type="button" disabled>
+          <span>ENTERING ARENA...</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL 4: PLAYER INSPECT PROFILE POPUP -->
+  <div class="modal hidden" id="playerProfileModal">
+    <div class="modal-backdrop" id="closeProfileBackdrop"></div>
+    <section class="modal-box inspect-box">
+      <button class="modal-close" id="closeProfileBtn" type="button">×</button>
+      <div class="inspect-avatar-wrap">
+        <img id="inspectAvatarImg" src="../../../profile/avatars/char1.jpg" alt="Avatar">
+      </div>
+      <h2 id="inspectPlayerName">SURVIVOR</h2>
+      <span class="inspect-team-tag" id="inspectPlayerTeam">TEAM B • SQUAD MEMBER</span>
+
+      <div class="inspect-specs">
+        <div class="spec-tile">
+          <div class="spec-label-group">
+            <small>FOLLOWERS</small>
+            <span>FAN NETWORK</span>
+          </div>
+          <strong id="inspectFollowers">1,280</strong>
+        </div>
+
+        <div class="spec-tile">
+          <div class="spec-label-group">
+            <small>BOUNTY TOKENS</small>
+            <span>EARNED SQUAD REWARDS</span>
+          </div>
+          <strong class="token-value" id="inspectBounty">4,500 TOKENS</strong>
+        </div>
+
+        <div class="spec-tile highlight-tile">
+          <div class="spec-label-group">
+            <small>SURVIVAL INDEX (S.I.)</small>
+            <span id="inspectWinsLosses">SQUAD: 24 WINS / 8 LOSS</span>
+          </div>
+          <strong class="si-value" id="inspectSI">3.00 (VETERAN)</strong>
+        </div>
+      </div>
+
+      <button type="button" id="roomFollowPlayerBtn" class="action-btn-green" style="width:100%;margin-top:12px;">+ FOLLOW OPERATIVE</button>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="team-room.js"></script>
+</body>
+</html>

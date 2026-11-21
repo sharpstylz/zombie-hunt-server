@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZOMBIE HUNT — Direct Messages & Comms Inbox</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="messages.css">
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="../monetization-config.js"></script>
+  
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-client.js"></script>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="topbar">
+    <button type="button" class="nav-pill-btn" id="backHubBtn">
+      <span>←</span> <b>HOME HUB</b>
+    </button>
+
+    <div class="dm-brand-head">
+      <img src="../icons/icon-messages.png" alt="Messages" class="brand-dm-icon" onerror="this.style.display='none'">
+      <div>
+        <div class="dm-title">DIRECT <i>COMMS</i></div>
+        <div class="dm-sub">PRIMARY CHATS • STEALTH REQUEST INBOX</div>
+      </div>
+    </div>
+
+    <div class="top-right-actions">
+      <button type="button" class="nav-pill-btn" id="newMessageModalBtn">
+        <b>+ NEW MESSAGE</b>
+      </button>
+      <button type="button" class="nav-pill-btn" id="goMyProfileBtn">
+        <b>MY PROFILE</b> <span>›</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- FULL-PAGE INSTAGRAM-STYLE SPLIT DM SHELL -->
+  <main class="dm-page-shell">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="dm-sidebar" id="dmSidebarPane">
+      <div class="sidebar-search-box">
+        <input type="text" id="threadSearchInput" placeholder="Search operative handle or message..." autocomplete="off">
+      </div>
+
+      <div class="dm-folder-tabs">
+        <button type="button" class="folder-tab active" id="tabPrimaryBtn" data-folder="primary">
+          <span>PRIMARY</span>
+          <b class="tab-count-pill" id="primaryCountBadge">0</b>
+        </button>
+
+        <button type="button" class="folder-tab" id="tabRequestsBtn" data-folder="requests">
+          <span>REQUESTS</span>
+          <b class="tab-count-pill request-pill" id="requestsCountBadge">0</b>
+        </button>
+      </div>
+
+      <div class="folder-rule-hint" id="folderRuleHint">
+        Active chats with operatives you follow or accepted. Read receipts (Seen ✓✓) are active.
+      </div>
+
+      <div class="dm-thread-list" id="dmThreadList"></div>
+    </aside>
+
+    <!-- RIGHT PANE: ACTIVE CONVERSATION WINDOW -->
+    <section class="dm-chat-window" id="dmChatWindowPane">
+
+      <div class="dm-empty-state hidden" id="dmEmptyState">
+        <div class="empty-icon-circle">
+          <img src="../icons/icon-messages.png" alt="Messages" style="width:48px;height:48px;object-fit:contain;" onerror="this.outerHTML='💬'">
+        </div>
+        <h2>YOUR ENCRYPTED COMMS</h2>
+        <p>Select a conversation on the left or message any operative from their Public Profile or Top-10 Leaderboard.</p>
+        <button type="button" class="start-chat-cta" id="emptyNewChatBtn">START NEW MESSAGE →</button>
+      </div>
+
+      <div class="dm-active-conversation" id="dmActiveConversation">
+
+        <!-- CHAT HEADER WITH CALL & MUTE BUTTONS -->
+        <header class="chat-partner-header">
+          <div class="partner-left" id="openPartnerProfileBtn" title="Click to open full Public Profile">
+            <button type="button" class="mobile-back-threads" id="mobileBackThreadsBtn">←</button>
+            <div class="partner-avatar-wrap" id="partnerAvatarWrap">
+              <img id="partnerAvatarImg" src="../profile/avatars/char14.jpg" alt="Partner">
+              <div id="partnerPinnedTick"></div>
+            </div>
+            <div class="partner-meta">
+              <div class="partner-name-row">
+                <strong id="partnerDisplayName">VIKRAM_APEX</strong>
+                <span id="partnerInlineTick"></span>
+              </div>
+              <small id="partnerSubStats">RANK #1 • 14,800 CP • 6.85 HX</small>
+            </div>
+          </div>
+
+          <div class="partner-right-actions">
+            <button type="button" class="header-action-btn call-btn" id="startAudioCallBtn" title="Live Voice Call">📞</button>
+            <button type="button" class="header-action-btn mute-btn" id="openMuteSettingsBtn" title="Mute Settings">🔕</button>
+            <button type="button" class="header-action-btn view-prof-btn" id="headerViewProfileBtn">PROFILE ›</button>
+          </div>
+        </header>
+
+        <div class="dm-messages-stream" id="dmMessagesStream"></div>
+
+        <div class="request-gate-banner hidden" id="dmRequestGateBanner">
+          <div class="gate-info">
+            <span class="stealth-tag">🔒 STEALTH READ MODE (SEEN HIDDEN)</span>
+            <p id="requestGateText">
+              You are reading this request privately. <b>@OPERATIVE</b> will NOT see "Seen ✓✓" or know you read their messages unless you click <b>ACCEPT</b>.
+            </p>
+          </div>
+          <div class="gate-btn-row">
+            <button type="button" class="gate-btn decline-btn" id="declineRequestBtn">DELETE REQUEST</button>
+            <button type="button" class="gate-btn accept-btn" id="acceptRequestBtn">ACCEPT & ENABLE CHAT ✓✓</button>
+          </div>
+        </div>
+
+        <form class="dm-composer-bar" id="dmComposerForm">
+          <input type="text" id="dmMessageInput" maxlength="220" placeholder="Write a message..." autocomplete="off">
+          <button type="submit" class="dm-send-btn">SEND →</button>
+        </form>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: START NEW DM -->
+  <div class="modal hidden" id="newDmModal">
+    <div class="modal-backdrop" id="closeNewDmBackdrop"></div>
+    <section class="modal-box">
+      <button type="button" class="modal-close" id="closeNewDmBtn">×</button>
+      <span class="modal-eyebrow">PUBLIC OPERATIVE DIRECTORY</span>
+      <h2>NEW DIRECT MESSAGE</h2>
+      <p style="font-size:12px;color:#545e57;margin-bottom:12px;">Enter any operative handle or pick from top hunters below:</p>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <input type="text" id="customTargetHandleInput" maxlength="18" placeholder="Enter @handle..." style="flex:1;padding:11px 14px;border-radius:12px;border:1.5px solid #c6bba4;background:#fff9ed;font-weight:700;">
+        <button type="button" class="dm-send-btn" id="startCustomHandleChatBtn">OPEN CHAT</button>
+      </div>
+      <div class="quick-roster-list" id="quickDirectoryList"></div>
+    </section>
+  </div>
+
+  <!-- MODAL: MUTE SETTINGS -->
+  <div class="modal hidden" id="muteSettingsModal">
+    <div class="modal-backdrop" id="closeMuteBackdrop"></div>
+    <section class="modal-box" style="max-width:360px;">
+      <button type="button" class="modal-close" id="closeMuteBtn">×</button>
+      <span class="modal-eyebrow">PRIVACY CONTROLS</span>
+      <h2>MUTE SETTINGS</h2>
+      <p style="font-size:11px;color:#626c65;margin-bottom:18px;">They won't know you muted them. You can still read their messages silently.</p>
+      
+      <div class="mute-toggle-row">
+        <div style="text-align:left;">
+          <strong style="display:block;font-size:14px;color:#18221d;">MUTE MESSAGES</strong>
+          <small style="color:#5a635c;font-size:10px;">Stop receiving message notifications.</small>
+        </div>
+        <label class="zh-switch"><input type="checkbox" id="muteMessagesToggle"><span class="zh-slider"></span></label>
+      </div>
+
+      <div class="mute-toggle-row" style="margin-top:12px;">
+        <div style="text-align:left;">
+          <strong style="display:block;font-size:14px;color:#18221d;">MUTE AUDIO CALLS</strong>
+          <small style="color:#5a635c;font-size:10px;">Block incoming call popups/rings.</small>
+        </div>
+        <label class="zh-switch"><input type="checkbox" id="muteCallsToggle"><span class="zh-slider"></span></label>
+      </div>
+    </section>
+  </div>
+
+  <!-- OVERLAY: LIVE AUDIO CALL (INCOMING & ACTIVE) -->
+  <div class="call-overlay hidden" id="activeCallOverlay">
+    <div class="call-overlay-bg"></div>
+    <div class="call-content">
+      <span class="call-status-tag" id="callStatusTag">CALLING...</span>
+      <div class="call-avatar-pulse">
+        <img id="callAvatarImg" src="../profile/avatars/char1.jpg" alt="Caller">
+      </div>
+      <h2 id="callTargetName">VIKRAM_APEX</h2>
+      <p id="callTimerDisplay">00:00</p>
+      
+      <div class="call-controls-row">
+        <button type="button" class="call-btn-circle btn-red" id="endCallBtn">
+          <svg viewBox="0 0 24 24"><path d="M12 9c-3.3 0-6.4 1.1-8.9 3.2l-2.2-2.2C4.1 7.2 7.9 5.5 12 5.5s7.9 1.7 11.1 4.5l-2.2 2.2C18.4 10.1 15.3 9 12 9z"/></svg>
+        </button>
+        <button type="button" class="call-btn-circle btn-dark hidden" id="callMicToggleBtn">🎤</button>
+        <button type="button" class="call-btn-circle btn-green hidden" id="acceptCallBtn">
+          <svg viewBox="0 0 24 24"><path d="M20.5 16.5c-1.3-1.3-3.3-1.3-4.6 0l-1.3 1.3c-2.8-1.5-5.1-3.8-6.6-6.6l1.3-1.3c1.3-1.3 1.3-3.3 0-4.6L7 3C5.7 1.7 3.7 1.7 2.4 3c-1.8 1.8-2 4.7-.5 7 2.1 3.5 5.5 6.9 9 9 2.3 1.5 5.2 1.3 7-.5 1.3-1.3 1.3-3.3 0-4.6l-2.3-2.3z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM SHEET MENU (LONG PRESS ON CHAT THREAD) -->
+  <div class="modal hidden" id="threadContextMenu">
+    <div class="modal-backdrop" id="closeContextMenuBackdrop"></div>
+    <section class="bottom-sheet-menu">
+      <div class="sheet-drag-handle"></div>
+      <div style="padding: 0 20px 20px;">
+        <div class="context-profile-info" id="contextMenuProfileInfo">
+          <img id="contextMenuAvatar" src="../profile/avatars/char1.jpg" alt="User">
+          <h3 id="contextMenuName">@USERNAME</h3>
+        </div>
+        
+        <div class="context-actions-list">
+          <button type="button" class="context-action-btn" id="ctxViewProfileBtn">
+            <span class="icon">👤</span> View Public Profile
+          </button>
+          
+          <button type="button" class="context-action-btn" id="ctxMuteMessagesBtn">
+            <span class="icon" id="ctxMsgIcon">🔕</span> <span id="ctxMsgText">Mute Messages</span>
+          </button>
+          
+          <button type="button" class="context-action-btn" id="ctxMuteCallsBtn">
+            <span class="icon" id="ctxCallIcon">📵</span> <span id="ctxCallText">Mute Audio Calls</span>
+          </button>
+          
+          <button type="button" class="context-action-btn danger-btn" id="ctxDeleteChatBtn">
+            <span class="icon">🗑️</span> Delete Conversation
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="messages.js"></script>
+</body>
+</html>

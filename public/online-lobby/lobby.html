@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZOMBIE HUNT — Online Squad Lobby</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="lobby.css">
+
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-client.js"></script>
+
+  <script src="../monetization-config.js"></script>
+</head>
+
+<body>
+  <div class="grain"></div>
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+  <div class="bg-orb orb-three"></div>
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" type="button">
+      <span>←</span>
+      <b>EXIT</b>
+    </button>
+
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 64 64" class="zombie-logo">
+          <path d="M15 25C14 15 23 8 32 9C43 9 51 17 50 28L48 45C47 52 40 56 32 55C23 56 17 51 16 44Z"/>
+          <path class="brain" d="M22 17C24 12 28 11 30 15C33 10 37 11 38 15C42 12 46 16 44 20"/>
+          <circle cx="24" cy="29" r="5"/>
+          <circle cx="40" cy="29" r="5"/>
+          <path d="M23 42C28 46 37 46 42 41"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">ZOMBIE <i>HUNT</i></div>
+        <div class="brand-sub" id="brandSubMode">MULTI-SQUAD SURVIVAL ARENA</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="stat-pill" style="padding:5px 12px;border-radius:20px;background:#192620;color:#fff3cd;display:flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;flex-shrink:0;">
+          <circle cx="12" cy="12" r="9" fill="#f5c85b" stroke="#b38618" stroke-width="2"/>
+          <path d="M9 9h6l-6 6h6" stroke="#18201c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <strong id="topWalletTokens" style="font-size:13px;">5,000</strong>
+      </div>
+
+      <div class="player-mini" id="openProfileEditBtn" title="Click to Edit Identity & Avatar" style="cursor:pointer;">
+        <div class="mini-avatar" id="miniAvatar">
+          <img src="../profile/avatars/char1.jpg" alt="Player">
+        </div>
+        <div class="mini-meta">
+          <span class="mini-name" id="miniName">SURVIVOR</span>
+          <small class="mini-status"><span class="pulse-dot" id="serverPulseDot"></span> <span id="serverStatusText">CONNECTING...</span></small>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN VIEW -->
+  <main class="lobby-page" style="position:relative;z-index:5;">
+    <section class="lobby-heading">
+      <div class="intro-row">
+        <div>
+          <div class="eyebrow">
+            <span></span>
+            TOURNAMENT ASSEMBLY • LIVE VOICE ENABLED
+          </div>
+          <h1>SQUAD <strong>SHOWDOWN.</strong></h1>
+          <p id="lobbyModeDesc">Online survivors split into rival sectors. Match mobilizes automatically when full.</p>
+        </div>
+
+        <div class="stats-overview-board">
+          <div class="stat-pill">
+            <small>YOUR SQUAD</small>
+            <strong id="headerMyTeamName">SEARCHING...</strong>
+          </div>
+          <div class="stat-pill">
+            <small>ASSEMBLED</small>
+            <strong id="playerCount">0 / 16</strong>
+          </div>
+          <div class="stat-pill">
+            <small>PRIZE POOL</small>
+            <strong style="color:#a37217;display:flex;align-items:center;gap:4px;">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;flex-shrink:0;">
+                <circle cx="12" cy="12" r="9" fill="#f5c85b" stroke="#b38618" stroke-width="2"/>
+                <path d="M9 9h6l-6 6h6" stroke="#18201c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+              <span id="headerPrizePool">16,000</span>
+            </strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARENA SIZE SWITCHER & CUSTOM ROOM LINK BAR -->
+    <section class="mode-banner" style="flex-wrap:wrap;justify-content:space-between;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="mode-icon">⚔</div>
+        <div class="mode-info">
+          <small id="modeLabel">ONLINE MULTIPLAYER • ENTRY: 1,000 TOKENS</small>
+          <strong id="modeTitle">16-PLAYER GRAND ARENA</strong>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="rename-team-btn mode-switch-pill" data-mode="4P" style="padding:6px 10px;font-size:10px;">4P DUEL</button>
+        <button type="button" class="rename-team-btn mode-switch-pill" data-mode="8P" style="padding:6px 10px;font-size:10px;">8P CLASH</button>
+        <button type="button" class="rename-team-btn mode-switch-pill" data-mode="16P" style="padding:6px 10px;font-size:10px;">16P ARENA</button>
+        <button type="button" class="rename-team-btn" id="copyInviteLinkBtn" style="padding:6px 12px;font-size:10px;background:#2e7d5b;color:#fff;border-color:#2e7d5b;">SHARE ROOM LINK</button>
+      </div>
+    </section>
+
+    <!-- SQUADS DYNAMIC GRID -->
+    <section class="squads-tournament-section">
+      <div class="squads-grid" id="squadsContainer">
+        <!-- TEAM A -->
+        <div class="squad-box squad-a" id="squadBoxA">
+          <div class="squad-box-header">
+            <div class="squad-title-wrap">
+              <span class="squad-badge badge-a">A</span>
+              <h2 class="squad-name" id="nameTeamA">TEAM ALPHA</h2>
+              <div id="renameSlotA"></div>
+            </div>
+            <div class="squad-counter" id="countA">0/4</div>
+          </div>
+          <div class="squad-roster" id="slotsA"></div>
+        </div>
+
+        <!-- TEAM B -->
+        <div class="squad-box squad-b" id="squadBoxB">
+          <div class="squad-box-header">
+            <div class="squad-title-wrap">
+              <span class="squad-badge badge-b">B</span>
+              <h2 class="squad-name" id="nameTeamB">TEAM BRAVO</h2>
+              <div id="renameSlotB"></div>
+            </div>
+            <div class="squad-counter" id="countB">0/4</div>
+          </div>
+          <div class="squad-roster" id="slotsB"></div>
+        </div>
+
+        <!-- TEAM C -->
+        <div class="squad-box squad-c" id="squadBoxC">
+          <div class="squad-box-header">
+            <div class="squad-title-wrap">
+              <span class="squad-badge badge-c">C</span>
+              <h2 class="squad-name" id="nameTeamC">TEAM CHARLIE</h2>
+              <div id="renameSlotC"></div>
+            </div>
+            <div class="squad-counter" id="countC">0/4</div>
+          </div>
+          <div class="squad-roster" id="slotsC"></div>
+        </div>
+
+        <!-- TEAM D -->
+        <div class="squad-box squad-d" id="squadBoxD">
+          <div class="squad-box-header">
+            <div class="squad-title-wrap">
+              <span class="squad-badge badge-d">D</span>
+              <h2 class="squad-name" id="nameTeamD">TEAM DELTA</h2>
+              <div id="renameSlotD"></div>
+            </div>
+            <div class="squad-counter" id="countD">0/4</div>
+          </div>
+          <div class="squad-roster" id="slotsD"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTOMATIC COUNTDOWN & WAITING STATUS CARD -->
+    <section class="waiting-card" id="waitingCard">
+      <div class="pulse-ring" id="statusRing">
+        <span id="ringCore"></span>
+      </div>
+      <div>
+        <strong id="statusHeader">Connecting to Survival Queue...</strong>
+        <p id="waitingText">Share the Room Link with friends or wait for combatants to assemble. Match launches automatically when full.</p>
+      </div>
+    </section>
+
+    <section class="lobby-actions">
+      <button class="leave-btn" id="leaveBtn" type="button">LEAVE LOBBY</button>
+    </section>
+
+    <div class="security-note">
+      <span>●</span>
+      AUTO-LAUNCH MATCHMAKING PROTOCOL • LIVE VOICE & ANTI-CHEAT PROTECTED
+    </div>
+  </main>
+
+  <!-- MODAL 1: PROFILE EDIT MODAL -->
+  <div class="modal hidden" id="profileEditModal">
+    <div class="modal-backdrop" id="closeProfileBackdrop"></div>
+    <section class="modal-box rename-box">
+      <button class="modal-close" id="closeProfileModalBtn" type="button">×</button>
+      <span class="modal-eyebrow">IDENTITY CONFIG</span>
+      <h2>EDIT PROFILE</h2>
+
+      <!-- GENDER SELECTOR -->
+      <div style="display:flex;gap:8px;margin:8px 0 12px;">
+        <button type="button" id="lobbyGenderMaleBtn" style="flex:1;padding:8px;border-radius:10px;border:2px solid #2563eb;background:#dbeafe;color:#1e40af;font-family:'Oswald',sans-serif;font-weight:700;cursor:pointer;">MALE (BLUE)</button>
+        <button type="button" id="lobbyGenderFemaleBtn" style="flex:1;padding:8px;border-radius:10px;border:2px solid rgba(0,0,0,0.12);background:#faf3df;color:#9d174d;font-family:'Oswald',sans-serif;font-weight:700;cursor:pointer;">FEMALE (PINK)</button>
+      </div>
+
+      <form id="profileEditForm">
+        <label style="display:block;font-size:9.5px;font-weight:800;margin-bottom:5px;color:var(--muted);">OPERATIVE HANDLE</label>
+        <input type="text" id="editProfileNameInput" maxlength="16" placeholder="Enter name..." autocomplete="off" required style="margin-bottom:10px;">
+
+        <button type="button" id="lobbyGoogleLoginBtn" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid #d1d5db;background:#fff;font-family:'Oswald',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+          SIGN IN WITH GOOGLE (UNLOCK 17 AVATARS)
+        </button>
+
+        <label style="display:block;font-size:9.5px;font-weight:800;margin-bottom:6px;color:var(--muted);">17 CHARACTER AVATARS</label>
+        <div class="avatar-select-grid" id="avatarSelectGrid" style="display:grid;grid-template-columns:repeat(6, 1fr);gap:8px;margin-bottom:18px;"></div>
+
+        <div class="modal-btn-row">
+          <button type="submit" class="btn-confirm">SAVE CHANGES</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- MODAL 2: SQUAD RENAME MODAL -->
+  <div class="modal hidden" id="renameTeamModal">
+    <div class="modal-backdrop" id="closeRenameBackdrop"></div>
+    <section class="modal-box rename-box">
+      <button class="modal-close" id="closeRenameBtn" type="button">×</button>
+      <span class="modal-eyebrow">SQUAD IDENTITY</span>
+      <h2>RENAME YOUR SQUAD</h2>
+      <p>Give your assigned squad a custom callsign. This will sync in real-time across all teammates.</p>
+
+      <form id="renameSquadForm">
+        <input type="text" id="squadNameInput" maxlength="18" placeholder="e.g. SHADOW CORPS" autocomplete="off" required>
+        <div class="modal-btn-row">
+          <button type="button" class="btn-cancel" id="cancelRenameBtn">CANCEL</button>
+          <button type="submit" class="btn-confirm">SAVE CALLSIGN</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- MODAL 3: PLAYER INSPECT MODAL -->
+  <div class="modal hidden" id="inspectModal">
+    <div class="modal-backdrop" id="closeInspectBackdrop"></div>
+    <section class="modal-box inspect-box">
+      <button class="modal-close" id="closeInspectBtn" type="button">×</button>
+      <div class="inspect-avatar-wrap">
+        <img id="inspectImg" src="../profile/avatars/char1.jpg" alt="Avatar">
+      </div>
+      <h2 id="inspectName">SURVIVOR</h2>
+      <span class="inspect-team-tag" id="inspectTeam">TEAM B</span>
+
+      <div class="inspect-specs">
+        <div class="spec-tile">
+          <div class="spec-label-group">
+            <small>FOLLOWERS</small>
+            <span>FAN NETWORK</span>
+          </div>
+          <strong id="inspectFollowers">1,280</strong>
+        </div>
+
+        <div class="spec-tile">
+          <div class="spec-label-group">
+            <small>BOUNTY TOKENS</small>
+            <span>AVAILABLE BALANCE</span>
+          </div>
+          <strong class="token-value" id="inspectBounty">5,000 TOKENS</strong>
+        </div>
+
+        <div class="spec-tile highlight-tile">
+          <div class="spec-label-group">
+            <small>SURVIVAL INDEX (S.I.)</small>
+            <span id="inspectWinsLosses">SQUAD: 24 WINS / 8 LOSS</span>
+          </div>
+          <strong class="si-value" id="inspectSI">3.00 (VETERAN)</strong>
+        </div>
+      </div>
+
+      <div id="inspectSocialActions" style="width:100%;margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+        <button type="button" class="btn-confirm" id="followPlayerBtn" style="width:100%;">+ FOLLOW PLAYER</button>
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="quickDmInput" maxlength="100" placeholder="Send private message..." style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--line);font-size:11px;">
+          <button type="button" class="btn-confirm" id="sendQuickDmBtn" style="padding:8px 12px;">SEND DM</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="lobby.js"></script>
+</body>
+</html>

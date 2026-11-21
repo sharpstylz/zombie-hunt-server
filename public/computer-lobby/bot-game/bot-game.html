@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZOMBIE HUNT — Tactical Bot Arena</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bot-game.css">
+  <script src="../../monetization-config.js"></script>
+
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../supabase-client.js"></script>
+</head>
+
+<body>
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+  <div class="bg-orb orb-three"></div>
+  <div class="grain"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" id="forfeitBtn" type="button" style="background:#dc2626;color:#fff;padding:6px 12px;border-radius:10px;">
+        <span>🏳</span>
+        <b>FORFEIT</b>
+      </button>
+
+      <div class="difficulty-indicator-badge" id="hudDifficultyBadge">
+        <span id="hudDifficultyDot">●</span>
+        <strong id="hudDifficultyText">LVL 02 • SURVIVOR AI</strong>
+      </div>
+    </div>
+
+    <!-- 90 SECONDS TURN CLOCK -->
+    <div class="game-turn-clock" style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.85);border:1px solid rgba(48,75,92,0.18);padding:4px 14px;border-radius:20px;">
+      <span style="font-size:12px;">⏳</span>
+      <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.05em;" id="turnTimerText">01:30</span>
+    </div>
+
+    <div class="topbar-right">
+      <div class="round-box">
+        <small>ROUND</small>
+        <strong id="roundNumber">1</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- GAME LAYOUT -->
+  <main class="game-layout">
+    <!-- RIGHT INFORMATION PANEL -->
+    <aside class="side-panel">
+      <div class="panel-card">
+        <div class="panel-heading">
+          <div>
+            <small>MATCH</small>
+            <h2>STATUS</h2>
+          </div>
+          <span class="live-dot">● LIVE</span>
+        </div>
+
+        <button class="info-button" id="eliminatedBtn" type="button">
+          <span>☠</span>
+          <div>
+            <strong>ELIMINATED PLAYERS</strong>
+            <small>View team status</small>
+          </div>
+          <b>›</b>
+        </button>
+
+        <div class="team-status">
+          <div class="status-title">
+            <span>YOUR TEAM</span>
+            <b id="sideSquadName">TEAM B</b>
+          </div>
+          <div id="teamMembers"></div>
+        </div>
+
+        <!-- IN-ARENA 1v1 DUEL PARLEY / TAUNT CHAT -->
+        <div style="margin-top:10px;border-top:1px solid rgba(48,75,92,0.12);padding-top:8px;">
+          <small style="font-size:8px;font-weight:900;color:var(--muted);letter-spacing:0.1em;display:block;margin-bottom:4px;">💬 1v1 DUEL PARLEY (OPPONENT ONLY)</small>
+          <div id="duelChatBox" style="height:68px;overflow-y:auto;background:#fff;border:1px solid rgba(48,75,92,0.12);border-radius:8px;padding:6px;font-size:10px;margin-bottom:6px;"></div>
+          <form id="duelChatForm" style="display:flex;gap:4px;">
+            <input type="text" id="duelChatInput" maxlength="90" placeholder="Convince or bluff rival..." style="flex:1;padding:6px 8px;border-radius:8px;border:1px solid rgba(48,75,92,0.2);font-size:10px;">
+            <button type="submit" style="border:0;background:var(--blue-dark);color:#fff;border-radius:8px;padding:0 10px;font-size:9px;font-weight:800;cursor:pointer;">SEND</button>
+          </form>
+        </div>
+      </div>
+    </aside>
+
+    <!-- BATTLE AREA -->
+    <section class="battle-area">
+      <!-- OPPONENT -->
+      <div class="opponent-area battle-player-row">
+        <div class="character-side opponent-side">
+          <button class="profile-avatar opponent-avatar" id="opponentProfile" type="button">
+            <img id="opponentImage" src="../../profile/avatars/char2.jpg" alt="Opponent">
+            <span class="online-dot"></span>
+          </button>
+
+          <div class="character-info">
+            <span class="team-label" id="opponentTeamLabel">TEAM A • OPPONENT</span>
+            <strong id="opponentName">BLAKE</strong>
+            <small id="opponentStatus">COMPUTER</small>
+          </div>
+        </div>
+
+        <div class="opponent-hand" id="opponentHand"></div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-zone">
+        <div class="suit-banner">
+          <span class="suit-icon" id="suitIcon">♥</span>
+          <div>
+            <small>CURRENT SUIT</small>
+            <strong id="currentSuit">HEARTS</strong>
+          </div>
+        </div>
+
+        <div class="table" id="battleTableSurface">
+          <div class="table-glow"></div>
+          <div class="table-inner">
+            <div class="center-status" id="centerStatus">
+              <small>CHOOSE YOUR CARDS</small>
+              <strong>YOUR TURN</strong>
+            </div>
+
+            <div class="played-cards opponent-played" id="opponentPlayed"></div>
+            <div class="table-center-mark"><span>ZH</span></div>
+            <div class="played-cards player-played" id="playerPlayed"></div>
+          </div>
+        </div>
+
+        <!-- TOTALS -->
+        <div class="totals-board hidden" id="totalsBoard">
+          <div class="total-side">
+            <span id="resultOpponentName">BLAKE</span>
+            <strong id="opponentTotal">0</strong>
+            <small>OPPONENT TOTAL</small>
+          </div>
+
+          <div class="total-vs"><span>VS</span></div>
+
+          <div class="total-side yours">
+            <span id="resultPlayerName">SURVIVOR</span>
+            <strong id="playerTotal">0</strong>
+            <small>YOUR TOTAL</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAYER -->
+      <div class="player-area">
+        <div class="player-card-row">
+          <button class="open-cards-btn" id="openCardsBtn" type="button">
+            <div class="card-preview" id="cardPreview"></div>
+            <div class="open-cards-label">
+              <strong>YOUR CARDS</strong>
+              <small>Tap to choose</small>
+            </div>
+            <span>↗</span>
+          </button>
+
+          <div class="character-side player-side">
+            <button class="profile-avatar player-avatar" id="playerProfile" type="button">
+              <img id="playerImage" src="../../profile/avatars/char1.jpg" alt="Player">
+              <span class="online-dot"></span>
+            </button>
+
+            <div class="character-info">
+              <span class="team-label" id="playerTeamLabel">TEAM B • YOU</span>
+              <strong id="playerName">SURVIVOR</strong>
+              <small id="playerRoleSub">YOU</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <div class="selection-count" id="selectionCount">0 SELECTED</div>
+          <button class="lock-btn" id="lockBtn" type="button" disabled>
+            <span>🔒</span> LOCK CARDS
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- CARD SELECTION MODAL -->
+  <div class="modal hidden" id="cardModal">
+    <div class="modal-backdrop"></div>
+    <section class="card-modal-box">
+      <button class="modal-close" id="closeCardModal" type="button">×</button>
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">YOUR HAND</span>
+          <h2>CHOOSE YOUR CARDS</h2>
+        </div>
+        <div class="modal-suit">
+          <span id="modalSuitIcon">♥</span>
+          <small>SUIT: <b id="modalSuit">HEARTS</b></small>
+        </div>
+      </div>
+      <p class="selection-help">
+        Choose any number cards you want to play (unclaimed cards stay in your hand for next rounds!). You may also select up to 1 special card.
+      </p>
+      <div class="selection-grid" id="selectionGrid"></div>
+      <div class="modal-footer">
+        <div>
+          <strong id="modalSelectedCount">0</strong>
+          <span>CARDS SELECTED</span>
+        </div>
+        <button class="modal-lock-btn" id="modalLockBtn" type="button" disabled>
+          LOCK SELECTED <span>→</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- FORFEIT CONFIRMATION MODAL -->
+  <div class="modal hidden" id="forfeitModal">
+    <div class="modal-backdrop" id="closeForfeitBackdrop"></div>
+    <section class="status-modal" style="text-align:center;">
+      <span class="eyebrow" style="color:#dc2626;">SURRENDER COMBAT</span>
+      <h2>FORFEIT BOT TOURNAMENT?</h2>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 16px;">You will abandon the current tournament and return to the War Room Lobby.</p>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button type="button" id="cancelForfeitBtn" style="padding:10px 18px;border-radius:10px;border:1px solid rgba(0,0,0,0.15);background:#fff;font-weight:800;cursor:pointer;">CANCEL</button>
+        <button type="button" id="confirmForfeitBtn" style="padding:10px 20px;border-radius:10px;border:0;background:#dc2626;color:#fff;font-weight:800;cursor:pointer;">CONFIRM FORFEIT</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ELIMINATED PLAYERS -->
+  <div class="modal hidden" id="eliminatedModal">
+    <div class="modal-backdrop"></div>
+    <section class="status-modal">
+      <button class="modal-close" id="closeEliminated" type="button">×</button>
+      <span class="eyebrow">MATCH STATUS</span>
+      <h2>ELIMINATED PLAYERS</h2>
+      <div id="eliminatedList"></div>
+    </section>
+  </div>
+
+  <!-- PROFILE POPUP -->
+  <div class="modal hidden" id="profileModal">
+    <div class="modal-backdrop"></div>
+    <section class="profile-modal">
+      <button class="modal-close" id="closeProfile" type="button">×</button>
+      <div class="profile-popup-avatar">
+        <img id="popupAvatar" src="../../profile/avatars/char2.jpg" alt="Profile">
+      </div>
+      <span class="eyebrow" id="popupTeam">COMPUTER PLAYER</span>
+      <h2 id="popupName">BLAKE</h2>
+      <div class="social-stats" id="socialStats"></div>
+    </section>
+  </div>
+
+  <!-- RESULT -->
+  <div class="modal hidden" id="resultModal">
+    <div class="modal-backdrop"></div>
+    <section class="result-modal">
+      <div class="result-word" id="resultWord">VICTORY</div>
+      <span class="result-line">ROUND COMPLETE</span>
+      <h2 id="resultWinner">SURVIVOR</h2>
+      <p id="resultDescription">You won the round.</p>
+
+      <div class="claim-section hidden" id="claimSection">
+        <span class="eyebrow">WINNER'S CHOICE</span>
+        <h3>CLAIM ONE REVEALED CARD</h3>
+        <div class="claim-cards" id="claimCards"></div>
+      </div>
+
+      <button class="continue-btn" id="continueBtn" type="button">
+        CONTINUE <span>→</span>
+      </button>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="bot-game.js"></script>
+</body>
+</html>

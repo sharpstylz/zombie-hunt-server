@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZOMBIE HUNT — Squad Command Room</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="team-room.css">
+  <script src="../../../monetization-config.js"></script>
+
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../../supabase-client.js"></script>
+</head>
+
+<body>
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+  <div class="bg-orb orb-three"></div>
+  <div class="grain"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="game-title">
+      <span>ZOMBIE</span> <strong>HUNT</strong>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button type="button" id="toggleIntelDrawerBtn" style="border:1px solid rgba(48,75,92,0.25);background:#fff;padding:6px 12px;border-radius:10px;font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">
+        📡 ENEMY SECTORS & INTEL (<span id="intelCount">0</span>)
+      </button>
+      <div class="round-box">
+        <small>NEXT</small>
+        <strong id="nextRound">2</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- SPECTATOR / ELIMINATION BANNER -->
+  <div id="spectatorBanner" class="spectator-banner hidden">
+    <div class="banner-left">
+      <strong id="bannerTitle">☠ YOU ARE ELIMINATED</strong>
+      <span id="bannerSub">Watch an active teammate. Your team is still alive.</span>
+    </div>
+    <div class="banner-actions">
+      <button type="button" class="banner-leave-btn" id="leaveGameBtn">LEAVE TO LOBBY</button>
+    </div>
+  </div>
+
+  <!-- SQUAD-FIRST MAIN VIEW (YOUR 4 TEAMMATES + LARGE SQUAD COMMS) -->
+  <main class="room-layout" style="grid-template-columns: 1.05fr 1.35fr;">
+    <!-- LEFT: YOUR 4 SQUAD MEMBERS -->
+    <section class="team-panel">
+      <div class="panel-heading-row">
+        <div>
+          <small>YOUR PRIVATE SQUAD (ISOLATED COMMS)</small>
+          <h2 id="teamName">TEAM B</h2>
+        </div>
+        <span class="live-dot" id="squadStatusDot">● <b id="onlineCount">4</b>/4 ALIVE</span>
+      </div>
+
+      <div class="team-grid" id="teamGrid" style="grid-template-columns:1fr;gap:10px;"></div>
+
+      <div class="round-summary" style="margin-top:auto;">
+        <span>PREPARING FOR</span>
+        <strong id="roundLabel">ROUND 2</strong>
+      </div>
+    </section>
+
+    <!-- RIGHT: LARGE SQUAD RADIO & TACTICAL CHAT (YOUR TEAM ONLY) -->
+    <aside class="chat-panel">
+      <div class="panel-heading-row">
+        <div>
+          <small>ENCRYPTED SQUAD CHANNEL (ONLY VISIBLE TO YOUR 4-MEMBER TEAM)</small>
+          <h2>SQUAD RADIO & VOICE COMMS</h2>
+        </div>
+        <span class="live-status">🎙️ TEAM ONLY</span>
+      </div>
+
+      <div class="chat-messages" id="chatMessages"></div>
+
+      <form class="chat-input" id="chatForm">
+        <input id="chatInput" type="text" maxlength="180" autocomplete="off" placeholder="Share Zombie suspects or strategy with your squad...">
+        <button type="submit">SEND TO SQUAD →</button>
+      </form>
+    </aside>
+  </main>
+
+  <!-- BOTTOM ACTION BAR -->
+  <footer class="room-footer">
+    <div class="footer-status">
+      <span class="pulse"></span>
+      <span id="footerStatusText">TACTICAL RECON IN PROGRESS...</span>
+    </div>
+
+    <div class="footer-buttons">
+      <label class="auto-ready-wrap" for="autoReadyToggle" title="Toggle Auto-Ready to skip 60s timer">
+        <input type="checkbox" id="autoReadyToggle">
+        <span class="toggle-slider"></span>
+        <span class="toggle-label">AUTO READY</span>
+      </label>
+
+      <button id="leaveBottomBtn" class="leave-room-btn" type="button">EXIT TO LOBBY</button>
+
+      <button id="actionBtn" class="deploy-btn" type="button" disabled>
+        <span id="actionBtnText">WAIT (3s)</span>
+        <b>→</b>
+      </button>
+    </div>
+  </footer>
+
+  <!-- COMPACT DRAWER MODAL: ALL TEAMS STATUS & FIELD INTEL -->
+  <div class="modal hidden" id="intelDrawerModal">
+    <div class="modal-backdrop" id="closeIntelDrawerBackdrop"></div>
+    <section class="modal-box" style="width:min(95vw, 560px);">
+      <button class="modal-close" id="closeIntelDrawerBtn" type="button">×</button>
+      <div class="modal-header">
+        <span class="modal-eyebrow">SURVIVAL BRACKETS & RECON</span>
+        <h2>ALL TEAMS STATUS & FIELD INTEL</h2>
+      </div>
+      <small style="font-size:9px;font-weight:800;color:var(--mint-deep);margin-bottom:6px;display:block;">TAP ANY SQUAD TO VIEW ROSTER / SPECTATE:</small>
+      <div class="standings-grid" id="standingsGrid" style="margin-bottom:14px;"></div>
+      <small style="font-size:9px;font-weight:800;color:var(--muted);margin-bottom:6px;display:block;">CONFIRMED FIELD INTEL:</small>
+      <div class="known-list" id="knownList" style="max-height:220px;"></div>
+    </section>
+  </div>
+
+  <!-- ROSTER MODAL POPUP -->
+  <div class="modal hidden" id="teamModal">
+    <div class="modal-backdrop" id="closeModalBackdrop"></div>
+    <section class="modal-box">
+      <button class="modal-close" id="closeTeamModal" type="button">×</button>
+      <div class="modal-header">
+        <span class="modal-eyebrow">TOURNAMENT ROSTER</span>
+        <h2 id="modalTeamTitle">TEAM STATUS</h2>
+      </div>
+      <div class="roster-list" id="rosterList"></div>
+    </section>
+  </div>
+
+  <!-- MATCHMAKING OVERLAY -->
+  <div class="modal hidden" id="matchmakingModal">
+    <div class="modal-backdrop"></div>
+    <section class="modal-box matchmaking-box">
+      <div class="modal-header matchmaking-header">
+        <div>
+          <span class="modal-eyebrow">ROUND PAIRINGS</span>
+          <h2>NEXT ENCOUNTERS</h2>
+        </div>
+        <div class="countdown-badge">
+          STATUS: <strong id="autoTimer">READY</strong>
+        </div>
+      </div>
+      <p class="matchmaking-desc" id="matchmakingDesc">Synchronizing with all battlefield duels...</p>
+      <div class="pairings-list" id="pairingsList"></div>
+      <button id="startBattleBtn" class="deploy-btn full-btn" type="button">
+        <span>ENTER BATTLE NOW</span>
+        <b>→</b>
+      </button>
+    </section>
+  </div>
+
+  <!-- GRAND TOURNAMENT CHAMPION POPUP -->
+  <div class="modal hidden" id="championModal">
+    <div class="modal-backdrop champion-backdrop"></div>
+    <section class="modal-box champion-box">
+      <div class="trophy-badge">🏆</div>
+      <span class="champion-eyebrow">TOURNAMENT CHAMPION</span>
+      <h1 id="championTeamTitle">VICTORIOUS</h1>
+      <div class="champion-avatar-wrap">
+        <img id="championAvatar" src="../../../profile/avatars/char1.jpg" alt="Champion">
+        <span class="crown-icon">👑</span>
+      </div>
+      <strong id="championPlayerName" class="champion-name">SURVIVOR</strong>
+      <p id="championDesc" class="champion-desc">Outlasted all other squads across the tournament!</p>
+      <button id="championLobbyBtn" class="deploy-btn full-btn champion-btn" type="button">
+        <span>RETURN TO LOBBY</span>
+        <b>→</b>
+      </button>
+    </section>
+  </div>
+
+  <script src="team-room.js"></script>
+</body>
+</html>

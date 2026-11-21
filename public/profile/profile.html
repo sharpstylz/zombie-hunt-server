@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZOMBIE HUNT — Operative Profile</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="profile.css">
+  <script src="../monetization-config.js"></script>
+
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-client.js"></script>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="topbar">
+    <button type="button" class="nav-pill-btn" id="backHubBtn">
+      <span>←</span> <b>HOME HUB</b>
+    </button>
+
+    <div class="top-handle-brand">
+      <span id="topHandleTitle">@survivor_01</span>
+      <span id="topVerifiedSlot"></span>
+    </div>
+
+    <div class="top-right-actions">
+      <div class="wallet-pill" id="topWalletBtn" title="Your Bounty Tokens">
+        <img src="../icons/bounty-token.png" alt="Tokens" class="custom-ui-icon" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+        <svg viewBox="0 0 24 24" class="fallback-svg-icon" style="display:none;width:16px;height:16px;">
+          <circle cx="12" cy="12" r="9" fill="#f5c85b" stroke="#b38618" stroke-width="2"/>
+          <path d="M9 9h6l-6 6h6" stroke="#18201c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <strong id="headerTokenCount">5,000</strong>
+      </div>
+
+      <button type="button" class="nav-pill-btn inbox-btn" id="openInboxPageBtn" title="Direct Messages & Requests">
+        <img src="../icons/icon-messages.png" alt="Messages" class="custom-ui-icon" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+        <svg viewBox="0 0 24 24" class="fallback-svg-icon" style="display:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+        <b>MESSAGES</b>
+        <span class="msg-badge" id="unreadMsgBadge">2</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- FULL-PAGE INSTAGRAM-STYLE PROFILE SHELL -->
+  <main class="insta-page-shell">
+
+    <section class="insta-header-section">
+
+      <!-- LEFT: AVATAR CIRCLE WITH PINNED BOTTOM-RIGHT VERIFIED TICK -->
+      <div class="insta-avatar-column">
+        <div class="insta-avatar-outer" id="instaAvatarCircle">
+          <img id="profileMainAvatar" src="avatars/char1.jpg" alt="Profile Avatar">
+          <div id="avatarPinnedTickSlot"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: DISPLAY NAME, @USERNAME, 3 COUNTERS, BIO & 2-LINE STATS -->
+      <div class="insta-info-column">
+
+        <div class="insta-name-actions-row">
+          <div>
+            <div class="insta-title-wrap">
+              <h1 id="profileDisplayName">SURVIVOR</h1>
+              <span id="nameInlineTickSlot"></span>
+              <span class="callsign-pill" id="profileCallsignBadge">BRONZE RECRUIT</span>
+            </div>
+            <div id="profileSubUsernameTag" style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;color:#2e7d5b;letter-spacing:0.6px;margin-top:2px;">@survivor_01</div>
+          </div>
+
+          <!-- OWNER BUTTONS -->
+          <div class="owner-actions-group" id="ownerActionsGroup">
+            <button type="button" class="insta-action-btn primary-edit-btn" id="openEditDrawerBtn">EDIT PROFILE</button>
+            <button type="button" class="insta-action-btn store-link-btn" id="goStoreBtn">ARMORY STORE</button>
+          </div>
+
+          <!-- VISITOR BUTTONS (ON OTHER PLAYERS' PUBLIC PROFILES) -->
+          <div class="visitor-actions-group hidden" id="visitorActionsGroup">
+            <button type="button" class="insta-action-btn follow-action-btn" id="visitorFollowBtn">FOLLOW</button>
+            <button type="button" class="insta-action-btn message-action-btn" id="visitorMessageBtn">MESSAGE</button>
+            <button type="button" class="insta-action-btn store-link-btn" id="visitorInviteRoomBtn">⚔️ INVITE TO ROOM</button>
+            <button type="button" class="insta-action-btn back-my-profile-btn" id="returnMyProfileBtn">MY PROFILE</button>
+          </div>
+        </div>
+
+        <!-- 3 MAIN COUNTERS: RANK, FOLLOWERS, FOLLOWING -->
+        <div class="insta-three-counters">
+          <button type="button" class="counter-box rank-counter-box" id="openRankLeaderboardBtn" title="Tap to view Top 10 Global Hunters">
+            <strong id="bigRankNumber">#483</strong>
+            <span>GLOBAL RANK <i>›</i></span>
+          </button>
+
+          <button type="button" class="counter-box" id="openFollowersModalBtn">
+            <strong id="bigFollowersCount">1,420</strong>
+            <span>FOLLOWERS</span>
+          </button>
+
+          <button type="button" class="counter-box" id="openFollowingModalBtn">
+            <strong id="bigFollowingCount">4</strong>
+            <span>FOLLOWING</span>
+          </button>
+        </div>
+
+        <!-- BIO & 2-LINE COMPACT TELEMETRY -->
+        <div class="insta-bio-block">
+          <p class="bio-paragraph" id="profileBioParagraph">Tactical Survivor • Read the cards, outbluff the room.</p>
+
+          <div class="telemetry-two-lines">
+            <div class="telemetry-line">
+              <span class="t-item">
+                <b>CP:</b> <em id="subStatCP">1,450</em>
+              </span>
+              <span class="t-dot">•</span>
+              <span class="t-item">
+                <b>HX:</b> <em id="subStatHX" class="hx-highlight">4.50</em>
+              </span>
+              <span class="t-dot">•</span>
+              <span class="t-item">
+                <b>MATCHES:</b> <em id="subStatMatches">36</em> <small id="subStatWinLoss">(24W / 12L)</small>
+              </span>
+            </div>
+
+            <div class="telemetry-line">
+              <span class="t-item">
+                <b>SHOTGUN KILLS:</b> <em id="subStatKills">9</em>
+              </span>
+              <span class="t-dot">•</span>
+              <span class="t-item">
+                <b>VACCINE CURES:</b> <em id="subStatCures">6</em>
+              </span>
+              <span class="t-dot">•</span>
+              <span class="t-item">
+                <b>BOUNTY:</b> <em id="subStatTokens" class="gold-highlight">5,000 TOKENS</em>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION NAVIGATION DIVIDER -->
+    <nav class="insta-section-tabs">
+      <button type="button" class="sec-tab active" data-sec="achievementsSection">
+        <svg viewBox="0 0 24 24" class="tab-svg"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        <span>ACHIEVEMENTS (<b id="unlockedAchCount">0/6</b>)</span>
+      </button>
+
+      <button type="button" class="sec-tab" data-sec="combatDossierSection">
+        <svg viewBox="0 0 24 24" class="tab-svg"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        <span>COMBAT ANALYTICS (CP & HX)</span>
+      </button>
+    </nav>
+
+    <section id="achievementsSection" class="insta-content-pane">
+      <div class="achievements-grid" id="achievementsGrid"></div>
+    </section>
+
+    <section id="combatDossierSection" class="insta-content-pane hidden">
+      <div class="analytics-cards-grid">
+        <div class="analytic-box">
+          <div class="a-head">
+            <img src="../icons/icon-cp.png" alt="CP" class="analytic-icon" onerror="this.style.display='none'">
+            <div>
+              <small>TOTAL STRENGTH</small>
+              <h3>COMBAT POWER (CP)</h3>
+            </div>
+          </div>
+          <div class="a-big-val" id="cardBigCP">1,450 CP</div>
+          <p>Calculated from your Tournament Championships (+150), Duel Wins (+25), Shotgun Kills (+80), Vaccine Cures (+60), and Zombie Infections (+50). Determines your Global Rank.</p>
+        </div>
+
+        <div class="analytic-box">
+          <div class="a-head">
+            <img src="../icons/icon-hx.png" alt="HX" class="analytic-icon" onerror="this.style.display='none'">
+            <div>
+              <small>LETHALITY RATIO</small>
+              <h3>HUNT INDEX (HX)</h3>
+            </div>
+          </div>
+          <div class="a-big-val hx-color" id="cardBigHX">4.50 HX</div>
+          <p>Your 2-letter tactical lethality ratio per defeat. Combines your round victories, shotgun eliminations, and bio-cures divided by total losses.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: TOP-10 GLOBAL HUNTERS LEADERBOARD -->
+  <div class="modal hidden" id="rankLeaderboardModal">
+    <div class="modal-backdrop" id="closeRankModalBackdrop"></div>
+    <section class="modal-box wide-modal-box">
+      <button type="button" class="modal-close" id="closeRankModalBtn">×</button>
+      <span class="modal-eyebrow">OFFICIAL STANDINGS • RANKED BY CP & HX</span>
+      <h2>TOP 10 APEX HUNTERS</h2>
+      <p class="modal-subnote" id="myRankBannerNote">Your Global Rank: #483 • Climb into the Top 10 to get highlighted on the board!</p>
+
+      <div class="people-list" id="top10LeaderboardContainer"></div>
+    </section>
+  </div>
+
+  <!-- MODAL 2: FOLLOWERS / FOLLOWING NETWORK -->
+  <div class="modal hidden" id="networkListModal">
+    <div class="modal-backdrop" id="closeNetworkModalBackdrop"></div>
+    <section class="modal-box wide-modal-box">
+      <button type="button" class="modal-close" id="closeNetworkModalBtn">×</button>
+      <span class="modal-eyebrow">PUBLIC SURVIVOR NETWORK</span>
+      <h2 id="networkModalHeading">FOLLOWING</h2>
+      <div class="people-list" id="networkListContainer"></div>
+    </section>
+  </div>
+
+  <!-- MODAL 3: EDIT PROFILE -->
+  <div class="modal hidden" id="editProfileModal">
+    <div class="modal-backdrop" id="closeEditModalBackdrop"></div>
+    <section class="modal-box wide-modal-box">
+      <button type="button" class="modal-close" id="closeEditModalBtn">×</button>
+      <span class="modal-eyebrow">OPERATIVE CUSTOMIZATION</span>
+      <h2>EDIT PROFILE & @USERNAME</h2>
+
+      <div class="gender-switch">
+        <button type="button" class="g-btn male-btn selected" id="btnMale">
+          <span class="dot blue"></span> MALE (BLUE GUEST)
+        </button>
+        <button type="button" class="g-btn female-btn" id="btnFemale">
+          <span class="dot pink"></span> FEMALE (PINK GUEST)
+        </button>
+      </div>
+
+      <div class="edit-fields-row">
+        <div class="field-group">
+          <label for="usernameInput">UNIQUE @USERNAME (SEARCH ID)</label>
+          <input type="text" id="usernameInput" maxlength="18" placeholder="e.g. seenu_07">
+        </div>
+        <div class="field-group">
+          <label for="nameInput">DISPLAY NAME</label>
+          <input type="text" id="nameInput" maxlength="18" placeholder="e.g. Seenu Rathore">
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-bottom:12px;">
+        <label for="bioInput">PUBLIC BIO</label>
+        <input type="text" id="bioInput" maxlength="95" placeholder="Your tactical bio...">
+      </div>
+
+      <!-- ==========================================
+           NEW DYNAMIC GOOGLE AUTH CONTAINER
+      =========================================== -->
+      <div id="dynamicAuthContainer" style="margin-bottom: 15px;">
+        
+        <!-- STATE 1: LOGGED OUT -->
+        <div id="authLoggedOutState" style="display: flex; flex-direction: column; gap: 8px;">
+          <button type="button" id="realGoogleLoginBtn" style="width:100%;padding:11px;border-radius:12px;border:1.5px solid #d1d5db;background:#ffffff;font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 6px rgba(0,0,0,0.05);transition:0.2s;">
+            <svg viewBox="0 0 48 48" style="width:18px;height:18px;">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-2.99s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            CONTINUE WITH GOOGLE (SIGN IN / SIGN UP)
+          </button>
+        </div>
+
+        <!-- STATE 2: LOGGED IN -->
+        <div id="authLoggedInState" style="display: none; align-items: center; justify-content: space-between; background: #f0fdf4; border: 1.5px solid #22c55e; padding: 10px 14px; border-radius: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px; color: #15803d; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 11.5px; letter-spacing: 0.5px;">
+            <span style="font-size:14px;">✅</span> GOOGLE ACCOUNT LINKED
+          </div>
+          <button type="button" id="realLogoutBtn" style="background: #fef2f2; color: #dc2626; border: 1.5px solid #ef4444; padding: 6px 14px; border-radius: 8px; font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s;">
+            LOGOUT
+          </button>
+        </div>
+
+      </div>
+      <div class="avatars-header">
+        <span>SELECT CHARACTER AVATAR (17 FREE)</span>
+        <small id="avatarLockHint">Sign in with Google to unlock</small>
+      </div>
+
+      <div class="avatars-grid" id="avatarsGrid"></div>
+
+      <button type="button" class="save-profile-btn" id="saveProfileBtn">SAVE CHANGES</button>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="profile.js"></script>
+<!-- ==========================================
+       ULTIMATE AUTH & 14-DAY USERNAME LOGIC
+  =========================================== -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(async () => {
+        // 1. Get UI Elements
+        const loggedOutState = document.getElementById("authLoggedOutState");
+        const loggedInState = document.getElementById("authLoggedInState");
+        const loginBtn = document.getElementById("realGoogleLoginBtn");
+        const logoutBtn = document.getElementById("realLogoutBtn");
+        
+        // 2. Check REAL Supabase Session
+        const { data: { session } } = await window.ZHSupabase.client.auth.getSession();
+
+        function lockAvatars(isLocked) {
+          const avatars = document.querySelectorAll(".avatar-option");
+          avatars.forEach((opt, index) => {
+            if (index >= 3) { // Lock all except first 3
+              if (isLocked) {
+                opt.classList.add("locked");
+                opt.style.opacity = "0.4";
+                opt.style.pointerEvents = "none";
+              } else {
+                opt.classList.remove("locked");
+                opt.style.opacity = "1";
+                opt.style.pointerEvents = "auto";
+              }
+            }
+          });
+        }
+
+        // 3. Apply State
+        if (session) {
+          loggedOutState.style.display = "none";
+          loggedInState.style.display = "flex";
+          lockAvatars(false); // Unlock
+        } else {
+          loggedOutState.style.display = "flex";
+          loggedInState.style.display = "none";
+          lockAvatars(true); // Lock
+        }
+
+        // 4. REAL Login Action
+        if(loginBtn) {
+          loginBtn.onclick = async (e) => {
+            e.preventDefault();
+            window.ZHSound?.play("click");
+            const { error } = await window.ZHSupabase.client.auth.signInWithOAuth({
+              provider: 'google',
+              options: { redirectTo: window.location.origin + window.location.pathname }
+            });
+            if(error) alert("Login Error: " + error.message);
+          };
+        }
+
+        // 5. REAL Logout Action
+        if(logoutBtn) {
+          logoutBtn.onclick = async (e) => {
+            e.preventDefault();
+            window.ZHSound?.play("click");
+            await window.ZHSupabase.client.auth.signOut();
+            window.location.reload();
+          };
+        }
+
+        // ==========================================
+        // 14-DAY USERNAME COOLDOWN LOGIC
+        // ==========================================
+        const saveBtn = document.getElementById("saveProfileBtn");
+        const usernameInput = document.getElementById("usernameInput");
+        
+        if(saveBtn && usernameInput && window.ZHStats) {
+          // Store old save function if it exists
+          const oldSaveClick = saveBtn.onclick; 
+          
+          saveBtn.onclick = (e) => {
+            const currentStats = window.ZHStats.getLocalPlayerStats();
+            const newUsername = usernameInput.value.trim().toLowerCase();
+            const oldUsername = currentStats.handle;
+
+            // Only check rule if they are actually changing the @username
+            if (newUsername !== "" && newUsername !== oldUsername) {
+              
+              // Get history from local storage
+              let history = JSON.parse(localStorage.getItem("zh_username_history") || "[]");
+              const now = Date.now();
+              const fourteenDaysMs = 14 * 24 * 60 * 60 * 1000;
+              
+              // Filter out changes older than 14 days
+              history = history.filter(time => (now - time) < fourteenDaysMs);
+
+              if (history.length >= 2) {
+                // Rule Broken: Already changed 2 times in 14 days
+                e.preventDefault();
+                e.stopImmediatePropagation(); // Stop profile from saving
+                window.ZHSound?.play("error");
+                
+                // Calculate days left until the oldest change expires
+                const timePassed = now - history[0];
+                const daysLeft = Math.ceil((fourteenDaysMs - timePassed) / (24 * 60 * 60 * 1000));
+                
+                alert(`SECURITY RESTRICTION:\nYou can only change your @username 2 times every 14 days.\n\nPlease wait ${daysLeft} more days before changing it again. (You can still change your Display Name)`);
+                
+                // Revert input field
+                usernameInput.value = oldUsername; 
+                return false; 
+              } else {
+                // Allowed: Save the timestamp of this change
+                history.push(now);
+                localStorage.setItem("zh_username_history", JSON.stringify(history));
+              }
+            }
+
+            // Let the original save function run (or your default logic)
+            if(typeof oldSaveClick === "function") {
+               oldSaveClick.call(saveBtn, e);
+            }
+          };
+        }
+
+      }, 300); // 300ms delay to ensure dummy code is overridden
+    });
+  </script>
+</body>
+</html>

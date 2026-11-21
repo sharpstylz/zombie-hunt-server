@@ -1,0 +1,842 @@
+/* =========================================================
+   ZOMBIE HUNT — FULL-PAGE INSTAGRAM PROFILE CSS
+   Location: public/profile/profile.css
+========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100vh;
+  font-family: "DM Sans", sans-serif;
+  color: #18221d;
+  background: #efe5ce;
+  overflow-x: hidden;
+}
+
+/* TOP NAVIGATION BAR */
+.topbar {
+  height: 78px;
+  padding: 0 5vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(246, 238, 218, 0.78);
+  backdrop-filter: blur(20px);
+  border-bottom: 1.5px solid rgba(24, 34, 29, 0.14);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.nav-pill-btn {
+  border: 1.5px solid rgba(24, 34, 29, 0.18);
+  background: rgba(255, 250, 238, 0.9);
+  color: #18221d;
+  padding: 8px 16px;
+  border-radius: 22px;
+  font-family: "Oswald", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-pill-btn:hover {
+  transform: translateY(-2px);
+  background: #18221d;
+  color: #f5c85b;
+}
+
+.top-handle-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: "Oswald", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.top-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-ui-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+.wallet-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #18221d;
+  color: #fff3cd;
+  padding: 7px 14px;
+  border-radius: 24px;
+  border: 1.5px solid rgba(245, 200, 91, 0.35);
+  font-family: "Oswald", sans-serif;
+  font-size: 14px;
+}
+
+.inbox-btn {
+  position: relative;
+}
+
+.msg-badge {
+  background: #d63d2a;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 12px;
+  margin-left: 2px;
+}
+
+/* =========================================================
+   FULL-PAGE INSTAGRAM LAYOUT SHELL
+========================================================= */
+.insta-page-shell {
+  width: min(980px, 94vw);
+  margin: 0 auto;
+  padding: 36px 0 80px;
+}
+
+.insta-header-section {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 44px;
+  align-items: center;
+  padding-bottom: 34px;
+  border-bottom: 1.5px solid rgba(24, 34, 29, 0.14);
+}
+
+.insta-avatar-column {
+  display: flex;
+  justify-content: center;
+}
+
+/* AVATAR CIRCLE WITH PINNED BOTTOM-RIGHT VERIFIED ROSETTE */
+.insta-avatar-outer {
+  position: relative;
+  width: 164px;
+  height: 164px;
+  border-radius: 50%;
+  border: 4px solid #18221d;
+  background: #1c2822;
+  box-shadow: 0 18px 42px rgba(24, 34, 29, 0.22);
+  flex-shrink: 0;
+}
+
+.insta-avatar-outer > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Pinned Tick on the 4-o'clock circular rim */
+#avatarPinnedTickSlot .zh-avatar-tick-pin {
+  position: absolute !important;
+  bottom: 4px !important;
+  right: 4px !important;
+  width: 38px !important;
+  height: 38px !important;
+  z-index: 20 !important;
+}
+
+.insta-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ROW 1: NAME & ACTION BUTTONS */
+.insta-name-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.insta-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.insta-title-wrap h1 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 44px;
+  letter-spacing: 1.5px;
+  line-height: 0.95;
+  color: #18221d;
+}
+
+.callsign-pill {
+  font-family: "Oswald", sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  background: #18221d;
+  color: #f5c85b;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-left: 4px;
+}
+
+.owner-actions-group,
+.visitor-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.insta-action-btn {
+  border: 1.5px solid rgba(24, 34, 29, 0.22);
+  background: rgba(255, 250, 238, 0.88);
+  color: #18221d;
+  padding: 9px 18px;
+  border-radius: 12px;
+  font-family: "Oswald", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.insta-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+}
+
+.primary-edit-btn {
+  background: #18221d;
+  color: #fff3cd;
+  border-color: #18221d;
+}
+
+.store-link-btn {
+  background: linear-gradient(135deg, #f5c85b, #d49a1a);
+  color: #141c18;
+  border-color: #b38618;
+}
+
+.follow-action-btn {
+  background: #2e7d5b;
+  color: #ffffff;
+  border-color: #2e7d5b;
+  min-width: 115px;
+}
+
+.follow-action-btn.is-following {
+  background: rgba(255, 250, 238, 0.9);
+  color: #18221d;
+  border-color: rgba(24, 34, 29, 0.3);
+}
+
+.message-action-btn {
+  background: #18221d;
+  color: #f5c85b;
+  border-color: #18221d;
+}
+
+/* ROW 2: THE 3 BIG INSTAGRAM COUNTERS (RANK, FOLLOWERS, FOLLOWING) */
+.insta-three-counters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 190px));
+  gap: 14px;
+}
+
+.counter-box {
+  border: 1.5px solid rgba(24, 34, 29, 0.15);
+  background: rgba(255, 251, 240, 0.72);
+  backdrop-filter: blur(12px);
+  padding: 12px 16px;
+  border-radius: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.counter-box:hover {
+  transform: translateY(-3px);
+  background: #ffffff;
+  border-color: #18221d;
+  box-shadow: 0 12px 26px rgba(24, 34, 29, 0.1);
+}
+
+.rank-counter-box {
+  background: linear-gradient(135deg, rgba(24, 34, 29, 0.94), rgba(35, 54, 45, 0.94));
+  border-color: #d4aa36;
+  color: #fff3cd;
+}
+
+.rank-counter-box:hover {
+  background: #18221d;
+  border-color: #f5c85b;
+}
+
+.counter-box strong {
+  display: block;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.rank-counter-box strong {
+  color: #f5c85b;
+}
+
+.counter-box span {
+  display: block;
+  font-family: "Oswald", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  opacity: 0.78;
+  margin-top: 3px;
+}
+
+.rank-counter-box span i {
+  font-style: normal;
+  color: #f5c85b;
+}
+
+/* ROW 3: BIO & 2-LINE COMPACT TELEMETRY */
+.insta-bio-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bio-paragraph {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #26312b;
+  line-height: 1.45;
+  max-width: 620px;
+}
+
+.telemetry-two-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11.5px;
+  color: #4f5952;
+  background: rgba(24, 34, 29, 0.05);
+  border-left: 3px solid #2e7d5b;
+  padding: 7px 12px;
+  border-radius: 0 10px 10px 0;
+  width: fit-content;
+}
+
+.telemetry-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.t-item b {
+  font-family: "Oswald", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  color: #18221d;
+}
+
+.t-item em {
+  font-style: normal;
+  font-weight: 800;
+  color: #18221d;
+}
+
+.t-item em.hx-highlight {
+  color: #d63d2a;
+}
+
+.t-item em.gold-highlight {
+  color: #b38618;
+}
+
+.t-dot {
+  opacity: 0.4;
+}
+
+/* =========================================================
+   INSTAGRAM-STYLE TABS & 6 ACHIEVEMENTS SHOWCASE GRID
+========================================================= */
+.insta-section-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  margin-bottom: 28px;
+}
+
+.sec-tab {
+  border: 0;
+  border-top: 3px solid transparent;
+  background: transparent;
+  padding: 14px 8px 6px;
+  margin-top: -1.5px;
+  font-family: "Oswald", sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #626c65;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.sec-tab.active {
+  border-top-color: #18221d;
+  color: #18221d;
+}
+
+.tab-svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.ach-card {
+  background: rgba(255, 251, 240, 0.82);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(24, 34, 29, 0.14);
+  border-radius: 22px;
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  box-shadow: 0 14px 32px rgba(24, 34, 29, 0.07);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.ach-card.unlocked {
+  border-color: #d4aa36;
+  background: rgba(255, 253, 246, 0.94);
+}
+
+.ach-card.locked {
+  opacity: 0.68;
+}
+
+.ach-emblem-wrap {
+  width: 78px;
+  height: 78px;
+  border-radius: 20px;
+  background: #18221d;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+}
+
+.ach-card.locked .ach-emblem-wrap {
+  filter: grayscale(85%);
+}
+
+.ach-emblem-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ach-status-tag {
+  font-family: "Oswald", sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.ach-card.unlocked .ach-status-tag {
+  background: rgba(46, 125, 91, 0.16);
+  color: #2e7d5b;
+}
+
+.ach-card.locked .ach-status-tag {
+  background: rgba(24, 34, 29, 0.08);
+  color: #626c65;
+}
+
+.ach-card h3 {
+  font-family: "Oswald", sans-serif;
+  font-size: 17px;
+  letter-spacing: 0.6px;
+}
+
+.ach-card p {
+  font-size: 11.5px;
+  color: #545e57;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.ach-progress-bar {
+  width: 100%;
+  height: 7px;
+  background: rgba(24, 34, 29, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.ach-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2e7d5b, #d4aa36);
+  border-radius: 10px;
+}
+
+/* ANALYTICS TAB */
+.analytics-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.analytic-box {
+  background: rgba(255, 251, 240, 0.88);
+  border: 1.5px solid rgba(24, 34, 29, 0.15);
+  border-radius: 22px;
+  padding: 24px;
+}
+
+.a-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.analytic-icon {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.a-head small {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #626c65;
+}
+
+.a-head h3 {
+  font-family: "Oswald", sans-serif;
+  font-size: 20px;
+}
+
+.a-big-val {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 48px;
+  color: #2e7d5b;
+  margin: 10px 0 6px;
+}
+
+.a-big-val.hx-color {
+  color: #d63d2a;
+}
+
+.analytic-box p {
+  font-size: 12.5px;
+  color: #4f5952;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   MODALS: TOP-10 LEADERBOARD, FOLLOW/UNFOLLOW & EDIT PROFILE
+========================================================= */
+.hidden { display: none !important; }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 9999;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 22, 18, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.modal-box {
+  position: relative;
+  z-index: 2;
+  width: min(560px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #f4ead5;
+  border: 2px solid rgba(24, 34, 29, 0.2);
+  border-radius: 26px;
+  padding: 26px;
+  text-align: center;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.45);
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(0,0,0,0.08);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modal-eyebrow {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+  color: #2e7d5b;
+}
+
+.modal-box h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 36px;
+  letter-spacing: 1px;
+  margin: 4px 0;
+}
+
+.modal-subnote {
+  font-size: 12px;
+  font-weight: 700;
+  color: #545e57;
+  margin-bottom: 14px;
+}
+
+.people-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  text-align: left;
+  margin-top: 10px;
+}
+
+.person-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff9ed;
+  border: 1.5px solid rgba(24, 34, 29, 0.12);
+  padding: 10px 14px;
+  border-radius: 16px;
+  transition: 0.18s;
+}
+
+/* Highlighted row when the player is in the Top 10 Leaderboard! */
+.person-row.me-highlighted-row {
+  background: linear-gradient(135deg, #fff8e1, #e6f7ef);
+  border: 2px solid #d49a1a;
+  box-shadow: 0 8px 22px rgba(212, 154, 26, 0.25);
+  transform: scale(1.015);
+}
+
+.person-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.rank-num-badge {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 24px;
+  width: 32px;
+  text-align: center;
+  color: #b38618;
+  flex-shrink: 0;
+}
+
+.person-avatar-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.person-avatar-wrap img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #18221d;
+}
+
+.person-meta strong {
+  display: block;
+  font-size: 13.5px;
+  color: #18221d;
+}
+
+.person-meta small {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #5c665f;
+}
+
+.follow-toggle-btn {
+  border: 1.5px solid #2e7d5b;
+  background: #2e7d5b;
+  color: #ffffff;
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-family: "Oswald", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: 0.15s;
+}
+
+.follow-toggle-btn.following {
+  background: transparent;
+  color: #18221d;
+  border-color: rgba(24, 34, 29, 0.28);
+}
+
+.follow-toggle-btn.following:hover {
+  background: #fae9e6;
+  color: #c94735;
+  border-color: #c94735;
+}
+
+/* EDIT MODAL CONTROLS */
+.gender-switch { display: flex; gap: 10px; margin: 12px 0; }
+.g-btn {
+  flex: 1; padding: 10px; border-radius: 12px; border: 2px solid rgba(24, 34, 29, 0.12);
+  background: #faf3df; font-family: "Oswald", sans-serif; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.blue { background: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
+.dot.pink { background: #f472b6; box-shadow: 0 0 8px #f472b6; }
+.male-btn.selected { border-color: #2563eb; background: #dbeafe; color: #1e40af; }
+.female-btn.selected { border-color: #ec4899; background: #fce7f3; color: #9d174d; }
+
+.edit-fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.field-group { text-align: left; }
+.field-group label { display: block; font-size: 9px; font-weight: 900; letter-spacing: 1px; color: #5a635c; margin-bottom: 4px; }
+.field-group input {
+  width: 100%; padding: 11px 13px; border-radius: 12px;
+  border: 1.5px solid #c6bba4; background: #fff9ed; font-size: 13px; font-weight: 700;
+}
+
+.google-btn {
+  width: 100%; padding: 11px; border-radius: 12px; border: 1.5px solid #d1d5db;
+  background: #ffffff; font-family: "Oswald", sans-serif; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 9px; cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.avatars-header { display: flex; justify-content: space-between; font-size: 10px; font-weight: 900; margin-bottom: 8px; }
+.avatars-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
+.av-slot {
+  position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 50%;
+  border: 2.5px solid transparent; overflow: hidden; cursor: pointer; background: #1c2420; padding: 0;
+}
+.av-slot img { width: 100%; height: 100%; object-fit: cover; }
+.av-slot.selected { border-color: #d63d2a; transform: scale(1.08); }
+.av-slot.locked img { filter: grayscale(90%) brightness(0.45); }
+.av-slot .lock-tag { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 12px; }
+
+.save-profile-btn {
+  width: 100%; padding: 14px; border: 0; border-radius: 14px;
+  background: linear-gradient(135deg, #22332b, #121d18); color: #f5c85b;
+  font-family: "Oswald", sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 1.5px; cursor: pointer;
+}
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 20px);
+  background: #18221d; color: #fff3cd; padding: 11px 22px; border-radius: 20px;
+  font-size: 12px; font-weight: 800; opacity: 0; pointer-events: none; transition: .25s; z-index: 10000;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* =========================================================
+   STRICT MOBILE RESPONSIVE FIX (NO-SCROLL & PERFECT GRID)
+========================================================= */
+@media (max-width: 760px) {
+  html, body {
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior-y: none;
+  }
+  .topbar {
+    height: 60px;
+    padding: 0 3vw;
+    flex-wrap: nowrap;
+  }
+  .nav-pill-btn { padding: 4px 8px; font-size: 9px; gap: 4px; }
+  .wallet-pill { padding: 4px 8px; font-size: 11px; }
+  .top-handle-brand { font-size: 14px; }
+  
+  .insta-page-shell {
+    height: calc(100dvh - 60px);
+    overflow-y: auto;
+    padding: 16px 4vw 40px;
+    margin: 0;
+    width: 100%;
+  }
+  .insta-header-section { grid-template-columns: 1fr; text-align: center; gap: 16px; padding-bottom: 16px; }
+  .insta-avatar-outer { width: 100px; height: 100px; margin: 0 auto; }
+  .insta-title-wrap { justify-content: center; }
+  .insta-title-wrap h1 { font-size: 32px; }
+  .insta-name-actions-row { justify-content: center; flex-direction: column; }
+  .owner-actions-group, .visitor-actions-group { justify-content: center; width: 100%; }
+  .insta-action-btn { padding: 8px 12px; font-size: 10px; flex: 1; }
+  
+  .insta-three-counters { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .counter-box { padding: 8px; }
+  .counter-box strong { font-size: 20px; }
+  .counter-box span { font-size: 8px; }
+  
+  .telemetry-two-lines { margin: 0 auto; text-align: left; }
+  .achievements-grid { grid-template-columns: 1fr; gap: 12px; }
+  .analytics-cards-grid, .edit-fields-row { grid-template-columns: 1fr; }
+}

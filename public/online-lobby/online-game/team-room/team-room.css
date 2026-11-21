@@ -1,0 +1,846 @@
+/* =========================================================
+   ZOMBIE HUNT — ONLINE SQUAD PRIVATE WAR ROOM
+   FIXED MODAL OVERRIDE, PROPER HIDE/SHOW & BUTTON ENGINE
+========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --cream: #ded2b9;
+  --cream-card: rgba(247, 239, 223, 0.75);
+  --cream-active: #fdf8ee;
+  --ink: #1c221e;
+  --muted: #6f6758;
+
+  --blue-dark: #304b5c;
+  --mint: #4da88c;
+  --mint-dark: #2c755f;
+  --green-btn: #2e7d5b;
+  --green-btn-hover: #24664a;
+  --red: #e95c54;
+  --red-dark: #b93e36;
+  --gold: #c69b54;
+
+  --line: rgba(45, 40, 33, 0.12);
+  --shadow: 0 14px 35px rgba(63, 51, 35, 0.08);
+}
+
+body {
+  min-height: 100vh;
+  font-family: "DM Sans", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 203, 92, .22), transparent 30%),
+    radial-gradient(circle at 90% 80%, rgba(79, 190, 170, .20), transparent 30%),
+    var(--cream);
+  overflow-x: hidden;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .08;
+  z-index: 50;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+}
+
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(55px);
+  pointer-events: none;
+  z-index: -2;
+}
+
+.orb-one { width: 220px; height: 220px; background: rgba(242, 95, 92, .18); top: -80px; left: -80px; }
+.orb-two { width: 240px; height: 240px; background: rgba(69, 166, 153, .16); right: -90px; top: 25%; }
+.orb-three { width: 180px; height: 180px; background: rgba(249, 192, 72, .18); bottom: -80px; left: 30%; }
+
+/* TOPBAR */
+.topbar {
+  height: 66px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  background: rgba(237, 226, 205, 0.88);
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.back-btn {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.65);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-family: "Oswald", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ink);
+  transition: all 0.15s ease;
+}
+
+.back-btn:hover { background: white; transform: translateX(-2px); }
+
+.squad-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--red);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-family: "Oswald", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.squad-brand h1 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 22px;
+  letter-spacing: .05em;
+  line-height: 0.9;
+}
+
+.squad-brand small {
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.round-indicator {
+  min-width: 60px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--blue-dark);
+  color: white;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.round-indicator small { font-size: 7.5px; opacity: 0.75; }
+.round-indicator strong { font-size: 18px; line-height: 1; }
+
+/* ROOM LAYOUT */
+.room-layout {
+  width: min(96vw, 1100px);
+  margin: 0 auto;
+  padding: 16px 8px 45px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* SPECTATOR BANNER */
+.spectator-banner {
+  background: #3b2a29;
+  color: white;
+  border: 1px solid rgba(233, 92, 84, 0.4);
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.banner-icon {
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(233, 92, 84, 0.25);
+  color: #f5c8c5;
+}
+
+.banner-content strong { display: block; font-family: "Oswald", sans-serif; font-size: 14px; }
+.banner-content p { font-size: 9px; opacity: 0.75; margin-top: 1px; }
+
+/* PANELS */
+.room-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.panel-box {
+  background: var(--cream-card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-eyebrow {
+  display: block;
+  font-size: 7.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.panel-header h2 {
+  font-family: "Oswald", sans-serif;
+  font-size: 17px;
+  letter-spacing: 0.03em;
+}
+
+.panel-badge {
+  font-size: 8px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(77, 168, 140, 0.18);
+  color: var(--mint-dark);
+}
+
+.tap-hint {
+  font-size: 7.5px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+/* SQUAD MEMBERS GRID */
+.team-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.squad-member-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.squad-member-card:hover {
+  background: white;
+  transform: translateX(3px);
+}
+
+.squad-member-card.is-you {
+  background: white;
+  border-color: var(--red);
+  box-shadow: 0 4px 14px rgba(233, 92, 84, 0.12);
+}
+
+.member-avatar-wrap {
+  width: 34px !important;
+  height: 34px !important;
+  max-width: 34px !important;
+  max-height: 34px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  border: 1.5px solid var(--red) !important;
+  background: #24221e !important;
+}
+
+.member-avatar-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.spectate-icon {
+  position: absolute;
+  inset: 0;
+  background: rgba(48, 75, 92, 0.85);
+  color: white;
+  border: 0;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.spectate-icon:hover { transform: scale(1.1); }
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-info strong {
+  display: block;
+  font-family: "Oswald", sans-serif;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-info small {
+  display: block;
+  font-size: 7.5px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.status-tag {
+  font-size: 8px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.status-alive { background: rgba(77, 168, 140, 0.18); color: var(--mint-dark); }
+.status-dead { background: rgba(233, 92, 84, 0.18); color: var(--red-dark); }
+.status-battling { background: rgba(198, 155, 84, 0.2); color: #8c6314; }
+
+/* AUTO-READY TOGGLE */
+.auto-ready-box {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auto-ready-info strong { display: block; font-size: 9.5px; }
+.auto-ready-info small { display: block; font-size: 7.5px; color: var(--muted); }
+
+.switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background-color: #cfc2a7; transition: .2s; border-radius: 20px;
+}
+.slider:before {
+  position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+  background-color: white; transition: .2s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--mint-dark); }
+input:checked + .slider:before { transform: translateX(18px); }
+
+/* STANDINGS GRID */
+.standings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.standing-card {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.65);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.standing-card:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.standing-card strong { display: block; font-family: "Oswald", sans-serif; font-size: 12px; }
+.standing-card small { display: block; font-size: 7.5px; font-weight: 800; color: var(--mint-dark); }
+.standing-card.eliminated-team small { color: var(--red-dark); }
+
+/* COMBAT INTEL SUMMARY */
+.intel-summary-box {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.intel-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.known-list {
+  max-height: 110px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.intel-tile {
+  background: white;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  font-size: 8.5px;
+  line-height: 1.35;
+}
+
+.intel-tile b { color: var(--red); }
+
+/* SQUAD CHAT */
+.chat-section { gap: 8px; }
+.live-status { font-size: 8.5px; font-weight: 800; color: var(--mint-dark); }
+
+.chat-messages {
+  height: 140px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-bubble {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid rgba(45, 40, 33, 0.15);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #111111 !important;
+  line-height: 1.45;
+  max-width: 82%;
+  align-self: flex-start;
+  word-break: break-word;
+}
+
+.chat-bubble.mine {
+  align-self: flex-end;
+  background: #fdf5f5;
+  border-color: rgba(233, 92, 84, 0.45);
+  color: #111111 !important;
+}
+
+.chat-bubble strong {
+  display: block;
+  font-family: "Oswald", sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #7b2923;
+  margin-bottom: 2px;
+}
+
+.chat-bubble.mine strong { color: #a82d24; }
+
+.chat-input-row { display: flex; gap: 8px; }
+
+.chat-input-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111111;
+  outline: none;
+}
+
+.chat-input-row input:focus { border-color: var(--blue-dark); }
+
+.send-btn {
+  border: 0;
+  padding: 0 20px;
+  border-radius: 10px;
+  background: var(--blue-dark);
+  color: white;
+  font-family: "Oswald", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.send-btn:hover { background: #203542; }
+
+/* FOOTER */
+.room-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0 6px;
+}
+
+.leave-btn-left {
+  border: 0;
+  background: var(--red);
+  color: white;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-family: "Oswald", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(233, 92, 84, 0.25);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.leave-btn-left:hover {
+  background: var(--red-dark);
+  transform: translateY(-2px);
+}
+
+.footer-btn-row { display: flex; gap: 8px; }
+
+.action-btn-green {
+  border: 0;
+  padding: 12px 28px;
+  border-radius: 12px;
+  background: var(--green-btn);
+  color: white;
+  font-family: "Oswald", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(46, 125, 91, 0.28);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.action-btn-green:hover:not(:disabled) {
+  background: var(--green-btn-hover);
+  transform: translateY(-2px);
+}
+
+.action-btn-green:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   STRICT MODAL VISIBILITY & OVERLAY FIX
+========================================================= */
+.hidden {
+  display: none !important;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+}
+
+.modal.hidden {
+  display: none !important;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(28, 34, 30, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1;
+}
+
+.modal-box {
+  position: relative;
+  width: min(100%, 420px);
+  background: #fdfaf4;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+  z-index: 2;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.08);
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  color: var(--ink);
+}
+
+.modal-close:hover {
+  background: rgba(233, 92, 84, 0.2);
+  color: var(--red);
+}
+
+.modal-eyebrow { font-size: 8px; font-weight: 800; letter-spacing: 0.14em; color: var(--red); }
+.roster-box h2 { font-family: "Oswald", sans-serif; font-size: 20px; margin-bottom: 12px; }
+
+.roster-list { display: flex; flex-direction: column; gap: 6px; max-height: 52vh; overflow-y: auto; }
+.roster-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.roster-item:hover { transform: translateX(2px); }
+.roster-item img {
+  width: 32px !important;
+  height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+.roster-info { flex: 1; }
+.roster-info strong { display: block; font-family: "Oswald", sans-serif; font-size: 11px; }
+.roster-info small { display: block; font-size: 7px; color: var(--muted); }
+
+.roster-spectate-btn {
+  border: 0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--blue-dark);
+  color: white;
+  font-size: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* INSPECT POPUP MODAL STYLING */
+.inspect-box {
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.inspect-avatar-wrap {
+  position: relative !important;
+  width: 76px !important;
+  height: 76px !important;
+  max-width: 76px !important;
+  max-height: 76px !important;
+  margin: 4px auto 10px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  border: 3px solid white !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15) !important;
+  background: #24221e !important;
+  flex-shrink: 0 !important;
+}
+
+.inspect-avatar-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.inspect-box h2 {
+  font-family: "Oswald", sans-serif;
+  font-size: 22px;
+  margin-bottom: 2px;
+  color: var(--ink);
+}
+
+.inspect-team-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.inspect-specs {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.spec-tile {
+  background: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.spec-label-group { text-align: left; }
+.spec-label-group small { display: block; font-family: "Oswald", sans-serif; font-size: 8.5px; color: var(--muted); letter-spacing: 0.1em; }
+.spec-label-group span { display: block; font-size: 7px; font-weight: 700; color: #8c8270; margin-top: 1px; }
+
+.spec-tile strong { font-family: "Oswald", sans-serif; font-size: 13px; color: var(--ink); }
+.spec-tile .token-value { color: #a37217; font-weight: 800; }
+.highlight-tile { background: #fbf5ea; border-color: rgba(201, 147, 43, 0.4); }
+.spec-tile .si-value { color: #2c755f; font-weight: 800; }
+
+/* MATCHMAKING GATEWAY */
+.matchmaking-box { text-align: center; }
+.mm-pulse { font-size: 32px; animation: bounce 1.2s infinite; margin-bottom: 6px; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+.matchmaking-box h2 { font-family: "Oswald", sans-serif; font-size: 20px; }
+.matchmaking-box p { font-size: 9.5px; color: var(--muted); margin-bottom: 14px; }
+
+.pairings-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+.pairing-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.pairing-side { display: flex; align-items: center; gap: 6px; }
+.pairing-side img { width: 26px !important; height: 26px !important; border-radius: 50%; object-fit: cover; }
+.pairing-info strong { display: block; font-family: "Oswald", sans-serif; font-size: 10px; }
+.pairing-info small { display: block; font-size: 6.5px; color: var(--muted); }
+.pairing-vs { font-size: 9px; font-weight: 900; color: var(--red); }
+
+.mm-footer { display: flex; align-items: center; gap: 10px; }
+.timer-badge { font-family: "Oswald", sans-serif; font-size: 12px; font-weight: 700; color: var(--mint-dark); min-width: 90px; }
+.start-btn { flex: 1; padding: 10px; border-radius: 10px; border: 0; background: var(--blue-dark); color: white; font-family: "Oswald", sans-serif; font-size: 10.5px; cursor: pointer; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, 20px);
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #24221e;
+  color: white;
+  font-size: 9.5px;
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 200;
+}
+
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (min-width: 760px) {
+  .room-columns { flex-direction: row; }
+}
+
+/* =========================================================
+   MOBILE FIX: 100DVH, SCALED FONTS & SCROLL-FREE LAYOUT
+========================================================= */
+@media (max-width: 760px) {
+  html, body {
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior-y: none;
+  }
+  .topbar {
+    padding: 5px 2vw;
+    min-height: 55px;
+    flex-wrap: nowrap;
+  }
+  .brand-badge { width: 26px; height: 26px; font-size: 14px; }
+  .squad-brand h1 { font-size: 18px; }
+  .squad-brand small { font-size: 6px; }
+  .back-btn { padding: 4px 10px; font-size: 9px; }
+  
+  .room-layout {
+    height: calc(100dvh - 55px);
+    padding: 6px 4vw;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .room-columns {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+  }
+  .panel-box {
+    padding: 8px;
+    flex: 1;
+    min-height: 0;
+  }
+  .panel-header { padding-bottom: 4px; margin-bottom: 4px; }
+  .panel-header h2 { font-size: 14px; }
+  .squad-member-card { padding: 4px 6px; gap: 6px; }
+  .member-avatar-wrap { width: 28px !important; height: 28px !important; }
+  .member-info strong { font-size: 10px; }
+  .chat-messages { flex: 1; padding: 6px; font-size: 10px; }
+  .chat-bubble { padding: 6px 8px; }
+  .chat-input-row input { padding: 6px 8px; font-size: 10px; }
+  .send-btn { padding: 0 12px; font-size: 9px; }
+  
+  .room-footer { padding: 6px 0; gap: 8px; }
+  .leave-btn-left, .action-btn-green { padding: 10px 14px; font-size: 10px; }
+}

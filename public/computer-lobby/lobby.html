@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZOMBIE HUNT — Tactical War Room</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="lobby.css">
+  <script src="../monetization-config.js"></script>
+  
+  <!-- Supabase JS Library & Connection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase-client.js"></script>
+</head>
+
+<body>
+  <div class="grain"></div>
+  <div class="bg-orb orb-one"></div>
+  <div class="bg-orb orb-two"></div>
+  <div class="bg-orb orb-three"></div>
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" type="button">
+      <span>←</span>
+      <b>EXIT TO HUB</b>
+    </button>
+
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 64 64" style="width:26px;height:26px;fill:#f5c85b;">
+          <path d="M15 25C14 15 23 8 32 9C43 9 51 17 50 28L48 45C47 52 40 56 32 55C23 56 17 51 16 44Z"/>
+          <circle cx="24" cy="29" r="5" fill="#1c221e"/>
+          <circle cx="40" cy="29" r="5" fill="#1c221e"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">ZOMBIE <i>HUNT</i></div>
+        <div class="brand-sub">TOURNAMENT WAR ROOM • WIN +1,000 BOUNTY</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="stat-pill" style="padding:5px 12px;border-radius:20px;background:#24302a;color:#fff3cd;display:flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;flex-shrink:0;">
+          <circle cx="12" cy="12" r="9" fill="#f5c85b" stroke="#b38618" stroke-width="2"/>
+          <path d="M9 9h6l-6 6h6" stroke="#18201c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <strong id="lobbyWalletDisplay" style="font-size:13px;">5,000</strong>
+      </div>
+      <div class="player-mini" id="myMiniProfile">
+        <div class="mini-avatar" id="miniAvatar">
+          <img src="../profile/avatars/char1.jpg" alt="Player">
+        </div>
+        <div class="mini-name" id="miniName">SURVIVOR</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN BIG ARENA VIEW -->
+  <main class="warroom-layout" style="position:relative;z-index:5;">
+    <section class="warroom-header">
+      <div class="intro-left">
+        <div class="eyebrow">
+          <span class="pulse-dot"></span>
+          QUAD-SQUAD ENGAGEMENT ACTIVE • CHAMPION REWARD: +1,000
+        </div>
+        <h1>THE <strong>BATTLEFIELD LOBBY</strong></h1>
+        <p>16 Survivors split into 4 rival sectors. Each quadrant conceals 1 covert carrier. Customize your squad and mobilize.</p>
+      </div>
+
+      <div class="stats-overview-board">
+        <div class="stat-pill">
+          <small>YOUR SQUAD</small>
+          <strong id="headerMyTeamName">TEAM B</strong>
+        </div>
+        <div class="stat-pill">
+          <small>SURVIVAL POTENTIAL</small>
+          <strong class="text-green" id="survivalRateDisplay">64.8%</strong>
+        </div>
+        <div class="stat-pill">
+          <small>CHAMPION BOUNTY</small>
+          <strong style="color:#a37217;">+1,000 TOKENS</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 DISTINCT QUADRANTS / SQUADS -->
+    <section class="quadrants-grid">
+      <!-- TEAM A -->
+      <div class="squad-box squad-a">
+        <div class="squad-box-header">
+          <div>
+            <span class="squad-tag">QUADRANT 01</span>
+            <h2 class="squad-name" id="nameTeamA">TEAM ALPHA</h2>
+          </div>
+          <div class="squad-score-tag">RIVAL SQUAD</div>
+        </div>
+        <div class="squad-roster" id="rosterTeamA"></div>
+      </div>
+
+      <!-- TEAM B (YOUR TEAM) -->
+      <div class="squad-box squad-b my-squad">
+        <div class="squad-box-header">
+          <div>
+            <div class="squad-title-row">
+              <span class="squad-tag my-tag">★ YOUR SQUAD</span>
+              <button class="edit-team-btn" id="editTeamNameBtn" type="button" title="Rename Your Squad">RENAME</button>
+            </div>
+            <h2 class="squad-name my-name" id="myTeamDisplay">TEAM B</h2>
+          </div>
+          <div class="squad-score-tag my-status">COMMAND UNIT</div>
+        </div>
+        <div class="squad-roster" id="rosterTeamB"></div>
+      </div>
+
+      <!-- TEAM C -->
+      <div class="squad-box squad-c">
+        <div class="squad-box-header">
+          <div>
+            <span class="squad-tag">QUADRANT 03</span>
+            <h2 class="squad-name" id="nameTeamC">TEAM CHARLIE</h2>
+          </div>
+          <div class="squad-score-tag">RIVAL SQUAD</div>
+        </div>
+        <div class="squad-roster" id="rosterTeamC"></div>
+      </div>
+
+      <!-- TEAM D -->
+      <div class="squad-box squad-d">
+        <div class="squad-box-header">
+          <div>
+            <span class="squad-tag">QUADRANT 04</span>
+            <h2 class="squad-name" id="nameTeamD">TEAM DELTA</h2>
+          </div>
+          <div class="squad-score-tag">RIVAL SQUAD</div>
+        </div>
+        <div class="squad-roster" id="rosterTeamD"></div>
+      </div>
+    </section>
+
+    <!-- CONTROL CONSOLE (DIFFICULTY & START) -->
+    <section class="console-card">
+      <div class="difficulty-wrapper">
+        <div class="section-label">
+          <span>HOSTILE AI INTELLECT</span>
+          <small id="difficultyHint">Balanced combat & memory intelligence</small>
+        </div>
+
+        <div class="difficulty-grid">
+          <button class="difficulty" data-level="easy" type="button">
+            <span>LVL 01</span>
+            <strong>RECRUIT</strong>
+            <small>Casual Bot AI</small>
+          </button>
+
+          <button class="difficulty" data-level="normal" type="button">
+            <span>LVL 02</span>
+            <strong>SURVIVOR</strong>
+            <small>Balanced Tactics</small>
+          </button>
+
+          <button class="difficulty" data-level="hard" type="button">
+            <span>LVL 03</span>
+            <strong>NIGHTMARE</strong>
+            <small>Adaptive & Ruthless</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="launch-wrapper">
+        <button class="start-btn" id="startBtn" type="button">
+          <div>
+            <small>ALL 16 COMBATANTS READY • WIN +1,000</small>
+            <strong>ENTER THE HUNT</strong>
+          </div>
+          <span class="arrow-wrap">→</span>
+        </button>
+        <div class="rule-note">
+          Covert Infection • Priority Matchmaking • Card Retention Rules Applied
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL 1: PLAYER PROFILE INSPECT POPUP -->
+  <div class="modal hidden" id="inspectModal">
+    <div class="modal-backdrop" id="closeInspectBackdrop"></div>
+    <section class="modal-box inspect-box">
+      <button class="modal-close" id="closeInspectBtn" type="button">×</button>
+      <div class="inspect-avatar-wrap">
+        <img id="inspectImg" src="../profile/avatars/char1.jpg" alt="Avatar">
+      </div>
+      <h2 id="inspectName">SURVIVOR</h2>
+      <span class="inspect-team-tag" id="inspectTeam">TEAM B</span>
+
+      <div class="inspect-specs">
+        <div class="spec-tile">
+          <small>OPERATOR TYPE</small>
+          <strong id="inspectClass">AI COMBATANT</strong>
+        </div>
+        <div class="spec-tile">
+          <small>COMBAT PROTOCOL</small>
+          <strong id="inspectProtocol">LEVEL 02: SURVIVOR</strong>
+        </div>
+        <div class="spec-tile">
+          <small>SQUAD ALLIANCE</small>
+          <strong id="inspectAlliance">FRIENDLY ALLY</strong>
+        </div>
+      </div>
+
+      <button type="button" class="btn-confirm" id="followOperativeBtn" style="width:100%;margin-top:14px;">+ FOLLOW OPERATIVE</button>
+    </section>
+  </div>
+
+  <!-- MODAL 2: CUSTOM TEAM NAME RENAME MODAL -->
+  <div class="modal hidden" id="teamNameModal">
+    <div class="modal-backdrop" id="closeTeamNameBackdrop"></div>
+    <section class="modal-box rename-box">
+      <button class="modal-close" id="closeTeamNameBtn" type="button">×</button>
+      <span class="modal-eyebrow">CUSTOMIZE SQUAD</span>
+      <h2>RENAME YOUR TEAM</h2>
+      <p>Give your squad a custom callsign. This name will appear across the battlefield and the scoreboard.</p>
+
+      <form id="renameForm">
+        <input type="text" id="customTeamInput" maxlength="20" placeholder="e.g. SHADOW CORPS" autocomplete="off" required>
+        <div class="modal-btn-row">
+          <button type="button" class="btn-cancel" id="cancelRenameBtn">CANCEL</button>
+          <button type="submit" class="btn-confirm">SAVE CALLSIGN</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="lobby.js"></script>
+</body>
+</html>
