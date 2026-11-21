@@ -5,7 +5,7 @@
    2. Instant Follow/Unfollow, Open Public Profile & 1-Click Room Invite
    3. Strict 7-Day Daily Streak Reset (Miss 1 Day = Reset to Day 1)
    4. 5-Chapter Cinematic Interactive Walkthrough Guide
-   5. Secret 5-Tap Logo Unlock for CEO Command HQ
+   5. Rewarded Ad (+500 Bounty Tokens with Live 5-Min Cooldown UI)
    Location: public/app.js
 ========================================================= */
 
@@ -13,6 +13,8 @@ const $ = id => document.getElementById(id);
 
 const PROFILE_KEY = "zh_profile";
 const AVATAR_FOLDER = "profile/avatars/";
+const AD_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
+const AD_REWARD_TOKENS = 500;
 let selectedMode = localStorage.getItem("zh_game_mode") || "online";
 
 let toastTimer;
@@ -22,7 +24,7 @@ function toast(msg) {
   clearTimeout(toastTimer);
   el.textContent = msg;
   el.classList.add("show");
-  toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
 }
 
 /* ---------------------------------------------------------
@@ -46,16 +48,11 @@ window.addEventListener("zh_wallet_updated", paintProfileAndWallet);
 window.addEventListener("zh_profile_changed", paintProfileAndWallet);
 
 /* ---------------------------------------------------------
-   2. NAVIGATION BUTTONS (PROFILE, STORE, INBOX, FREE AD)
+   2. NAVIGATION BUTTONS (PROFILE, INBOX, FREE AD)
 --------------------------------------------------------- */
 $("profileBtn")?.addEventListener("click", () => {
   window.ZHSound?.play("click");
   window.location.href = "profile/profile.html";
-});
-
-$("openStoreBtn")?.addEventListener("click", () => {
-  window.ZHSound?.play("click");
-  window.location.href = "store/store.html";
 });
 
 $("openMessagesHubBtn")?.addEventListener("click", () => {
@@ -63,12 +60,114 @@ $("openMessagesHubBtn")?.addEventListener("click", () => {
   window.location.href = "messages/messages.html";
 });
 
+let isAdPlaying = false;
+let adDefaultText = null;
+let adDefaultStyle = null;
+
+function formatTimerMMSS(ms) {
+  const totalSec = Math.max(0, Math.ceil(ms / 1000));
+  const mins = String(Math.floor(totalSec / 60)).padStart(2, "0");
+  const secs = String(totalSec % 60).padStart(2, "0");
+  return `${mins}:${secs}`;
+}
+
+function updateAdButtonUI() {
+  const btn = $("freeTokensAdBtn");
+  if (!btn) return;
+
+  if (adDefaultText === null) {
+    adDefaultText = btn.textContent.trim() || "+500 AD";
+    adDefaultStyle = {
+      background: btn.style.background || "",
+      color: btn.style.color || "",
+      borderColor: btn.style.borderColor || "",
+      opacity: btn.style.opacity || "",
+      cursor: btn.style.cursor || ""
+    };
+  }
+
+  const lastAdTime = Number(localStorage.getItem("zh_last_ad_time") || 0);
+  const remaining = AD_COOLDOWN_MS - (Date.now() - lastAdTime);
+
+  if (isAdPlaying) {
+    btn.disabled = true;
+    btn.textContent = "⏳ PLAYING...";
+    btn.style.background = "#3b4740";
+    btn.style.color = "#f5c85b";
+    btn.style.borderColor = "#f5c85b";
+    btn.style.opacity = "0.9";
+    btn.style.cursor = "not-allowed";
+    btn.setAttribute("data-ad-timer", "PLAYING");
+    return;
+  }
+
+  if (lastAdTime && remaining > 0) {
+    const mmss = formatTimerMMSS(remaining);
+    btn.disabled = true;
+    btn.textContent = `✕ ${mmss}`;
+    btn.style.background = "#262d29";
+    btn.style.color = "#fca5a5";
+    btn.style.borderColor = "#ef4444";
+    btn.style.opacity = "0.82";
+    btn.style.cursor = "not-allowed";
+    btn.setAttribute("data-ad-timer", mmss);
+    btn.title = `Next Ad available in ${mmss}`;
+  } else {
+    btn.disabled = false;
+    btn.textContent = adDefaultText;
+    btn.style.background = adDefaultStyle.background;
+    btn.style.color = adDefaultStyle.color;
+    btn.style.borderColor = adDefaultStyle.borderColor;
+    btn.style.opacity = adDefaultStyle.opacity;
+    btn.style.cursor = adDefaultStyle.cursor || "pointer";
+    btn.removeAttribute("data-ad-timer");
+    btn.title = "Watch Video Ad for +500 Bounty Tokens";
+  }
+}
+
+setInterval(updateAdButtonUI, 1000);
+
 $("freeTokensAdBtn")?.addEventListener("click", () => {
-  window.ZHAds?.watchRewardedAd("SUPPLY DROP: +2,000 BOUNTY TOKENS", () => {
-    window.ZHWallet?.addTokens(2000);
+  if (isAdPlaying) return;
+
+  const lastAdTime = Number(localStorage.getItem("zh_last_ad_time") || 0);
+  const now = Date.now();
+  const elapsed = now - lastAdTime;
+
+  if (lastAdTime && elapsed < AD_COOLDOWN_MS) {
+    updateAdButtonUI();
+    return;
+  }
+
+  isAdPlaying = true;
+  updateAdButtonUI();
+  window.ZHSound?.play("click");
+  toast("Playing Ad... Please wait 5s!");
+
+  const finishReward = () => {
+    if (!isAdPlaying) return;
+    isAdPlaying = false;
+    localStorage.setItem("zh_last_ad_time", String(Date.now()));
+
+    if (window.ZHWallet?.addTokens) {
+      window.ZHWallet.addTokens(AD_REWARD_TOKENS);
+    } else if ($("homeTokenBalance")) {
+      const currentBalance = parseInt($("homeTokenBalance").textContent.replace(/,/g, ""), 10) || 0;
+      $("homeTokenBalance").textContent = (currentBalance + AD_REWARD_TOKENS).toLocaleString();
+    }
+
     paintProfileAndWallet();
-    toast("+2,000 BOUNTY TOKENS CREDITED!");
-  });
+    updateAdButtonUI();
+    window.ZHSound?.play("unlock");
+    toast(`+${AD_REWARD_TOKENS} BOUNTY TOKENS CREDITED! (5m timer started)`);
+  };
+
+  if (window.ZHAds?.watchRewardedAd) {
+    window.ZHAds.watchRewardedAd(`SUPPLY DROP: +${AD_REWARD_TOKENS} BOUNTY TOKENS`, finishReward);
+    setTimeout(finishReward, 5000);
+  } else {
+    setTimeout(finishReward, 5000);
+  }
 });
 
 /* ---------------------------------------------------------
@@ -109,7 +208,6 @@ function renderHomeSearchResults(query = "") {
     `;
   }).join("");
 
-  // Click player -> Open their Public Profile
   container.querySelectorAll("[data-search-profile]").forEach(el => {
     el.addEventListener("click", () => {
       window.ZHSound?.play("click");
@@ -117,7 +215,6 @@ function renderHomeSearchResults(query = "") {
     });
   });
 
-  // Follow / Unfollow Toggle
   container.querySelectorAll("[data-search-follow]").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -129,7 +226,6 @@ function renderHomeSearchResults(query = "") {
     });
   });
 
-  // 1-Click Send Room Invite & Open DM
   container.querySelectorAll("[data-search-invite]").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -397,22 +493,6 @@ document.querySelectorAll(".ch-pill").forEach(pill => {
   });
 });
 
-/* ---------------------------------------------------------
-   7. SECRET 5-TAP LOGO UNLOCK FOR CEO COMMAND HQ
---------------------------------------------------------- */
-let secretLogoTaps = 0;
-let secretTapResetTimer = null;
-
-$("brandLogoSecretTap")?.addEventListener("click", () => {
-  secretLogoTaps++;
-  clearTimeout(secretTapResetTimer);
-  secretTapResetTimer = setTimeout(() => { secretLogoTaps = 0; }, 2200);
-  if (secretLogoTaps >= 5) {
-    secretLogoTaps = 0;
-    window.ZHSound?.play("lock");
-    window.location.href = "ceo-command-hq.html";
-  }
-});
-
 updateModeSelectionUI();
 paintProfileAndWallet();
+updateAdButtonUI();
