@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.zombiehunt.arena",
+        "sha256_cert_fingerprints": ["4B:94:38:A2:25:13:CD:2D:DC:7F:B2:0D:AD:F4:18:A3:29:55:56:34:A5:22:8D:FA:17:02:19:64:39:6B:74:FA"]
+      }
+    }]
