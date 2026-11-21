@@ -448,11 +448,6 @@ $("backHubBtn")?.addEventListener("click", () => {
   window.location.href = "../index.html";
 });
 
-$("goStoreBtn")?.addEventListener("click", () => {
-  window.ZHSound?.play("click");
-  window.location.href = "../store/store.html";
-});
-
 $("openInboxPageBtn")?.addEventListener("click", () => {
   window.ZHSound?.play("click");
   window.location.href = "../messages/messages.html";
